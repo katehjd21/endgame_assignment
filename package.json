@@ -1,5 +1,5 @@
 {
-  "name": "testing-pyramid",
+  "name": "testing-pyramid-assignment",
   "version": "1.0.0",
   "description": "- If running locally:     You can use `flask run`",
   "main": "cypress.config.js",
@@ -11,16 +11,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/katehjd21/testing-pyramid.git"
+    "url": "git+https://github.com/katehjd21/testing-pyramid-assignment.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/katehjd21/testing-pyramid/issues"
+    "url": "https://github.com/katehjd21/testing-pyramid-assignment/issues"
   },
-  "homepage": "https://github.com/katehjd21/testing-pyramid#readme",
+  "homepage": "https://github.com/katehjd21/testing-pyramid-assignment#readme",
   "devDependencies": {
     "cypress": "^15.6.0"
   }

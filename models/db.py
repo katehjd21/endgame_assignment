@@ -6,12 +6,12 @@ class Db:
     def save(duty):
         pass
 
-    def read(self):
+    def read(self, duty_number):
         pass
 
-    # def update(self):
-    #     pass
+    def update(self,duty):
+        pass
 
-    # def delete(self):
-    #     pass
+    def delete(self):
+        pass
 
