@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apprenticeship Coins</title>
+</head>
+<body>
+    <h1>Apprenticeship Coins</h1>
+    <ul>
+        {% for coin in coins %}
+          <li>
+            {% if coin.name == "Automate" %}
+            <a href="{{ url_for('automate_page') }}">{{ coin.name }}</a>
+            {% else %}
+                {{ coin.name }}
+            {% endif %}
+          </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

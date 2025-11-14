@@ -1,7 +1,7 @@
 Feature: Duty
     In order to say duty is complete
     As a user 
-    I want to see duty is comlete
+    I want to see duty is complete
 
 Scenario: Add two numbers
     When I complete a duty

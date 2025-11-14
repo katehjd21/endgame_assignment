@@ -1,10 +1,10 @@
 from models.db import Db
-from models.duty import Duty
+from models.duty_model import Duty
 import pytest
 
 @pytest.fixture 
 def duty():
-    return Duty(1, "Test Description", ["Knowledge", "Skills", "Behaviours"])
+    return Duty("Duty 1", "Test Description", ["Knowledge", "Skills", "Behaviours"])
 
 @pytest.fixture
 def db():
@@ -31,7 +31,8 @@ def test_user_can_update_a_duty(mocker, duty, db):
     assert updated_duty.description == "New Description!"
 
 def test_user_can_delete_a_duty(mocker, db):
-    mocker.patch.object(db, "delete", return_value=None)
+    mocked_delete = mocker.patch.object(db, "delete", return_value=None)
     assert db.delete() == None
+    assert mocked_delete.call_count == 1
 
 

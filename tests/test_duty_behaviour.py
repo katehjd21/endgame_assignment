@@ -1,6 +1,6 @@
 import unittest
 from morelia import run, verify
-from models.duty import Duty
+from models.duty_model import Duty
 
 class DutyTestCase(unittest.TestCase):
     duty = Duty.get_duty()

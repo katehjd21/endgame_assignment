@@ -7,13 +7,13 @@ class Duty:
     
     @staticmethod
     def get_duty():
-      return Duty(1, "Random Duty Description", ["K", "S", "B"])
+      return Duty("Duty 1", "Random Duty Description", ["Knowledge", "Skills", "Behaviours"])
 
     def mark_complete(self):
         self.complete = True
 
-    def save(duty):
-      print(f"Duty {duty.number} has been saved!")
+    def save(self):
+      print(f"Duty {self.number} has been saved!")
   
     def is_complete(self):
       if self.complete:
