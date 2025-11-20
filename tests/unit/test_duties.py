@@ -8,7 +8,7 @@ def duties():
 
 @pytest.fixture
 def duty():
-    return Duty("Duty 1", "Test description", ["Knowledge", "Skills", "Behaviours"])
+    return Duty(1, "Test description", ["Knowledge", "Skills", "Behaviours"])
 
 def test_add_duty(duties, duty):
     assert duties.add_duty(duty) == duty

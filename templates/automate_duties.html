@@ -3,17 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/automate_duties_page.css') }}">
     <title>Automate Duties</title>
 </head>
 <body>
     <h1>Automate Duties</h1>
-    <h2>{{ duty.number }}</h2>
-    <p>{{ duty.description }}</p>
-    <ul>
-        {% for ksb in duty.ksbs %}
-          <li>{{ ksb }}</li>
-        {% endfor %}
-    </ul>
-    <p>{{ duty.is_complete() }}</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Duty</th>
+                <th>Description</th>
+                <th>KSBS</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for duty in duties %}
+            <tr>
+                <td>{{ duty.number }}</td>
+                <td>{{ duty.description }}</td>
+                <td>{{ duty.ksbs | join(', ') }}</td>
+                {% if duty.complete %}
+                    <td>"Duty Complete"</td>
+                {% else %}
+                    <td>"Duty Not Complete"</td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h2>Add a New Duty</h2>
+    <form action="{{ url_for('add_automate_duty') }}" method="post">
+        <label>Duty Number: 
+            <input type="text" name="number" required/>
+        </label>
+        <label>Duty Description: 
+            <input type="text" name="description" required/>
+        </label>
+        <label>Knowledge, Skills, and Behaviours (separate with a comma): 
+            <input type="text" name="ksbs" required/>
+            <button type="submit">Add Duty</button>
+        </label>
+    </form>
 </body>
 </html>

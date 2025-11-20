@@ -4,7 +4,7 @@ import pytest
 
 @pytest.fixture 
 def duty():
-    return Duty("Duty 1", "Test Description", ["Knowledge", "Skills", "Behaviours"])
+    return Duty(1, "Test Description", ["Knowledge", "Skills", "Behaviours"])
 
 @pytest.fixture
 def db():

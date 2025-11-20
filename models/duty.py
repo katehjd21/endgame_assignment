@@ -7,7 +7,7 @@ class Duty:
     
     @staticmethod
     def get_duty():
-      return Duty("Duty 1", "Random Duty Description", ["Knowledge", "Skills", "Behaviours"])
+      return Duty(1, "Random Duty Description", ["Knowledge", "Skills", "Behaviours"])
 
     def mark_complete(self):
         self.complete = True
