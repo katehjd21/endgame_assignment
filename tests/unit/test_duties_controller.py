@@ -39,4 +39,18 @@ def test_does_not_add_duties_with_duplicate_numbers_to_duties_store(mocker, duty
 
     duplicate_duty = duties_controller.create_duty(1, "Test Description", ["Knowledge", "Skills", "Behaviours"])
     assert duplicate_duty is None
+
+def test_can_delete_a_duty(mocker, duties_controller):
+    mocked_delete = mocker.patch.object(duties_store, "delete_duty")
+
+    duties_controller.delete_duty(1)
+
+    mocked_delete.assert_called_once_with(1)
+
+def test_can_reset_all_duties(mocker, duties_controller):
+    mocked_reset = mocker.patch.object(duties_store, "reset")
+
+    duties_controller.reset_duties()
+
+    mocked_reset.assert_called_once()
     

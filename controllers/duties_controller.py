@@ -14,3 +14,11 @@ class DutiesController():
         duty = Duty(number, description, ksbs)
         created_duty = duties_store.add_duty(duty)
         return created_duty
+    
+    @staticmethod
+    def delete_duty(number):
+        return duties_store.delete_duty(number)
+
+    @staticmethod
+    def reset_duties():
+        duties_store.reset()

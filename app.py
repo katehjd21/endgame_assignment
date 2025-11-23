@@ -34,4 +34,24 @@ def add_automate_duty():
         return render_template("automate_duties.html", duties=duties, error=f"Duty {number} already exists!")
 
     return redirect(url_for('automate_page'))
+
+@app.route('/complete_duty/<number>', methods=['POST'])
+def complete_duty(number):
+    all_duties = DutiesController.fetch_all_duties()
+    for duty in all_duties:
+        if str(duty.number) == str(number):
+            duty.mark_complete() 
+            break
+    return redirect(url_for('automate_page'))
+
+@app.route('/delete_duty/<number>', methods=['POST'])
+def delete_duty(number):
+    DutiesController.delete_duty(number)
+    return redirect(url_for('automate_page'))
+
+
+@app.route('/reset_duties', methods=['POST'])
+def reset_duties():
+    DutiesController.reset_duties()
+    return redirect(url_for('automate_page'))
  

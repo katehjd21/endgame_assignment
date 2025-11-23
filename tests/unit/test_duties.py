@@ -39,3 +39,35 @@ def test_get_all_duties(duties, duty1):
     duties.add_duty(duty1)
     assert duties.get_all_duties() == [duty1]
 
+def test_delete_duty(duties, duty1, duty2):
+    duties.add_duty(duty1)
+    duties.add_duty(duty2)
+    duties.delete_duty(2)
+
+    remaining_duty_numbers = []
+    for duty in duties.get_all_duties():
+        remaining_duty_numbers.append(duty.number)
+    
+    assert len(remaining_duty_numbers) == 1
+    assert remaining_duty_numbers[0] == duty1.number
+
+def test_delete_nonexistent_duty_does_nothing(duties, duty1):
+    duties.add_duty(duty1)
+    duties.delete_duty(111)
+    
+    all_duty_numbers = []
+    for duty in duties.get_all_duties():
+        all_duty_numbers.append(duty.number)
+    
+    assert 1 in all_duty_numbers
+    assert len(all_duty_numbers) == 1
+
+def test_reset_all_duties(duties, duty1, duty2):
+    duties.add_duty(duty1)
+    duties.add_duty(duty2)
+    assert len(duties.get_all_duties()) == 2  
+
+    duties.reset()
+
+    assert duties.get_all_duties() == []
+    assert len(duties.get_all_duties()) == 0

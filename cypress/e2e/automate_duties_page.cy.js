@@ -27,7 +27,7 @@ describe('Automate Duties Page', () => {
         cy.get('input[name="description"]').type('Test Description')
         cy.get('input[name="ksbs"]').type('Knowledge, Skills, Behaviours')
 
-        cy.get('button[type="submit"]').click()
+        cy.get('.add-duty-button').click()
 
         cy.contains('td', '1')
         cy.contains('td', 'Test Description')
@@ -44,9 +44,22 @@ describe('Automate Duties Page', () => {
         cy.get('input[name="description"]').type('Another Description')
         cy.get('input[name="ksbs"]').type('Knowledge, Skills, Behaviours')
 
-        cy.get('button[type="submit"]').click()
+        cy.get('.add-duty-button').click()
 
-        cy.contains('"Duty Not Complete"')
+        cy.contains('Duty Not Complete')
+    })
+
+        it('marks a duty as complete when clicking Mark Complete button', () => {
+        cy.visit('/automate')
+
+        cy.get('input[name="number"]').type(1)
+        cy.get('input[name="description"]').type('Test Duty Description')
+        cy.get('input[name="ksbs"]').type('K, S, B')
+        cy.get('.add-duty-button').click()
+
+        cy.get('.complete-btn').click()
+
+        cy.contains('td', 'Duty Complete')
     })
 
 
@@ -57,23 +70,9 @@ describe('Automate Duties Page', () => {
     cy.get('input[name="description"]').type('KSBS Test')
     cy.get('input[name="ksbs"]').type('K, S, B')
 
-    cy.get('button[type="submit"]').click()
+    cy.get('.add-duty-button').click()
 
     cy.contains('td', 'K, S, B')
-    })
-
-
-    it('marks a duty as complete', () => {
-    cy.visit('/automate')
-
-    cy.get('input[name="number"]').type(1)
-    cy.get('input[name="description"]').type('Completed Duty Descriptio ')
-    cy.get('input[name="ksbs"]').type('K, S, B')
-    cy.get('button[type="submit"]').click()
-
-    cy.contains('Complete').click()
-
-    cy.contains('"Duty Complete!"')
     })
 
 
@@ -90,7 +89,8 @@ describe('Automate Duties Page', () => {
             cy.get('input[name="number"]').type(duty.number)
             cy.get('input[name="description"]').type(duty.description)
             cy.get('input[name="ksbs"]').type(duty.ksbs)
-            cy.get('button[type="submit"]').click()
+
+            cy.get('.add-duty-button').click()
         })
 
         cy.get('tbody tr').should('have.length', 3)
@@ -103,12 +103,12 @@ describe('Automate Duties Page', () => {
         cy.get('input[name="number"]').type(1)
         cy.get('input[name="description"]').type('Test Description 1')
         cy.get('input[name="ksbs"]').type('K, S, B')
-        cy.get('button[type="submit"]').click()
+        cy.get('.add-duty-button').click()
 
         cy.get('input[name="number"]').type(1)
         cy.get('input[name="description"]').type('Test Description 2')
         cy.get('input[name="ksbs"]').type('K, S, B')
-        cy.get('button[type="submit"]').click()
+        cy.get('.add-duty-button').click()
 
         cy.get('tbody tr').should('have.length', 1)
     })
@@ -119,8 +119,40 @@ describe('Automate Duties Page', () => {
     cy.get('input[name="number"]').type(1)
     cy.get('input[name="description"]').type('Test Description')
     cy.get('input[name="ksbs"]').type('K, S, B')
-    cy.get('button[type="submit"]').click()
+    cy.get('.add-duty-button').click()
 
     cy.url().should('include', '/automate')
     })
+
+
+    it('resets the duties table when clicking Reset Duties button', () => {
+    
+        cy.visit('/automate')
+
+        cy.get('input[name="number"]').type(1)
+        cy.get('input[name="description"]').type('Test Duty')
+        cy.get('input[name="ksbs"]').type('K, S, B')
+        cy.get('.add-duty-button').click()
+
+        cy.get('tbody tr').should('have.length', 1)
+
+        cy.get('.reset-button').click()
+
+        cy.get('tbody tr').should('have.length', 0)
+    })
+
+    it('allows the user to delete a duty', () => {
+        cy.visit('/automate');
+
+        cy.get('input[name="number"]').type(1);
+        cy.get('input[name="description"]').type('Duty to Delete');
+        cy.get('input[name="ksbs"]').type('K, S, B');
+        cy.get('.add-duty-button').click();
+
+        cy.contains('td', 'Duty to Delete');
+
+        cy.get('.delete-btn').click();
+
+        cy.contains('td', 'Duty to Delete').should('not.exist');
+    });
 })
