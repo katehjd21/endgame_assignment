@@ -4,7 +4,7 @@ from controllers.duties_controller import DutiesController
 
 class DutiesTestCase(unittest.TestCase):
 
-    def test_add_duty_feature(self):
+    def test_add_duties_feature(self):
         verify('tests/duties.feature', self)
 
     def step_an_empty_duties_collection(self):

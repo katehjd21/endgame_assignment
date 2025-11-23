@@ -62,6 +62,28 @@ def test_delete_nonexistent_duty_does_nothing(duties, duty1):
     assert 1 in all_duty_numbers
     assert len(all_duty_numbers) == 1
 
+def test_get_duty_returns_correct_duty(duties, duty1):
+    duties.add_duty(duty1)
+    retrieved_duty = duties.get_duty(1)
+
+    assert retrieved_duty is duty1
+    assert retrieved_duty.description == "Test description 1"
+
+def test_get_duty_returns_none_if_not_found(duties):
+    assert duties.get_duty(999) is None
+
+def test_edit_duty_updates_fields(duties, duty1):
+    duties.add_duty(duty1)
+
+    updated_duty = duties.edit_duty(1,"Updated Duty Description",["New K", "New S", "New B"])
+
+    assert updated_duty.description == "Updated Duty Description"
+    assert updated_duty.ksbs == ["New K", "New S", "New B"]
+
+def test_edit_nonexistent_duty_returns_none(duties):
+    updated_duty = duties.edit_duty(999, "Non-existent Duty", ["K", "S", "B"])
+    assert updated_duty is None
+
 def test_reset_all_duties(duties, duty1, duty2):
     duties.add_duty(duty1)
     duties.add_duty(duty2)

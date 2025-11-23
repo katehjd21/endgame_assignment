@@ -47,6 +47,22 @@ def test_can_delete_a_duty(mocker, duties_controller):
 
     mocked_delete.assert_called_once_with(1)
 
+def test_controller_can_get_a_duty(mocker, duties_controller):
+    mocked_get_duty = mocker.patch.object(duties_store, "get_duty", return_value="mocked duty")
+
+    result = duties_controller.get_duty(1)
+
+    mocked_get_duty.assert_called_once_with(1)
+    assert result == "mocked duty"
+
+def test_controller_can_edit_a_duty(mocker, duties_controller):
+    mocked_edit_duty = mocker.patch.object(duties_store, "edit_duty", return_value="updated duty")
+
+    updated_duty = duties_controller.edit_duty(1, "Updated Duty Description",["K", "S", "B"])
+
+    mocked_edit_duty.assert_called_once_with(1, "Updated Duty Description", ["K", "S", "B"])
+    assert updated_duty == "updated duty"
+
 def test_can_reset_all_duties(mocker, duties_controller):
     mocked_reset = mocker.patch.object(duties_store, "reset")
 

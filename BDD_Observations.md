@@ -1,0 +1,5 @@
+###  Record your observations on BDD and working this way, including the pros and cons, and how would you introduce it into your project.
+
+Test-driven development typically involves writing a test for a certain piece of functionality, running the test to see it fail and then writing the code to make the test pass. That way, developers can be confident that they’ve written code that does the job and other developers reusing components can run the test to be confident that their own code will properly function.
+
+Behavior-driven development typically involves a developer, test engineer and a product manager (and potentially other stakeholders). The group meets to come up with concrete examples of acceptance criteria in a user story. These examples are described using a domain-specific language, like Gherkin, and put into a feature file. The feature file is converted into an executable specification where developers can then write an actual executable test.

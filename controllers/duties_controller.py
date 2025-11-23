@@ -18,6 +18,14 @@ class DutiesController():
     @staticmethod
     def delete_duty(number):
         return duties_store.delete_duty(number)
+    
+    @staticmethod
+    def edit_duty(number, new_description, new_ksbs):
+        return duties_store.edit_duty(number, new_description, new_ksbs)
+
+    @staticmethod
+    def get_duty(number):
+        return duties_store.get_duty(number)
 
     @staticmethod
     def reset_duties():
