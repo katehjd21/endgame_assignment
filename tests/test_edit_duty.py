@@ -1,6 +1,6 @@
 import unittest
 from morelia import verify
-from controllers.duties_controller import DutiesController, duties_store
+from controllers.duties_controller import DutiesController
 
 class TestEditDuty(unittest.TestCase):
     def test_add_edit_duty_feature(self):
@@ -8,7 +8,7 @@ class TestEditDuty(unittest.TestCase):
 
     def step_Given_there_is_a_duty_with_number_1_and_description_Original_Duty_Description_and_KSBs_K_S_B(self):
         r'there is a duty with number 1 and description "Original Duty Description" and KSBs "K, S, B"'
-        duties_store.reset()
+        DutiesController.reset_duties()
         DutiesController.create_duty(1, "Original Duty Description", ["K", "S", "B"])
 
     def step_When_I_edit_the_duty_with_number_1_to_have_description_Updated_Duty_Description_and_KSBs_K1_S1_B1(self):

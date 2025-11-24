@@ -21,6 +21,12 @@ def add_automate_duty():
     ksbs = request.form.get('ksbs')
     ksbs_list = []
 
+    try:
+        number = int(number)
+    except (TypeError, ValueError):
+        duties = DutiesController.fetch_all_duties()
+        return render_template("automate_duties.html", duties=duties, error="Duty number must be a whole number (e.g. 1, 2, 3).")
+
     if ksbs:
         items = ksbs.split(',')
         for item in items:
@@ -35,6 +41,7 @@ def add_automate_duty():
 
     return redirect(url_for('automate_page'))
 
+
 @app.route('/complete_duty/<number>', methods=['POST'])
 def complete_duty(number):
     all_duties = DutiesController.fetch_all_duties()
@@ -48,6 +55,25 @@ def complete_duty(number):
 def delete_duty(number):
     DutiesController.delete_duty(number)
     return redirect(url_for('automate_page'))
+
+@app.route('/edit_duty/<number>', methods=['GET', 'POST'])
+def edit_duty(number):
+    number = int(number)
+    duty = DutiesController.get_duty(number)
+    if request.method == 'POST':
+        new_description = request.form.get('description')
+        new_ksbs = request.form.get('ksbs')
+        new_ksbs_list = []
+        if new_ksbs:
+            items = new_ksbs.split(',')
+            for item in items:
+                stripped_item = item.strip()
+                if stripped_item:
+                    new_ksbs_list.append(stripped_item)
+
+        DutiesController.edit_duty(number, new_description, new_ksbs_list)
+        return redirect(url_for('automate_page'))
+    return render_template("edit_duty.html", duty=duty)
 
 
 @app.route('/reset_duties', methods=['POST'])

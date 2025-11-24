@@ -16,7 +16,7 @@ class Duties():
         updated_duties = []
 
         for duty in self._duties:
-            if duty.number != number:
+            if duty.number != int(number):
                 updated_duties.append(duty)
 
         self._duties = updated_duties

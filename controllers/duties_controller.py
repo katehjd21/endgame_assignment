@@ -11,7 +11,11 @@ class DutiesController():
     
     @staticmethod
     def create_duty(number, description, ksbs):
-        duty = Duty(number, description, ksbs)
+        try:
+            number = int(number)
+        except (ValueError, TypeError):
+            return None
+        duty = Duty(int(number), description, ksbs)
         created_duty = duties_store.add_duty(duty)
         return created_duty
     

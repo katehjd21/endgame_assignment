@@ -21,7 +21,8 @@ def test_can_fetch_all_duties(mocker, duties_controller):
     assert fetched_list_of_duties == list_of_duties
     assert len(fetched_list_of_duties) == len(list_of_duties)
 
-def test_can_add_a_duty_to_the_duties_store_if_duty_number_is_unique(mocker, duty, duties_controller):
+
+def test_can_add_a_duty_to_the_duties_store_if_duty_number_is_unique_and_is_an_integer(mocker, duty, duties_controller):
     mocked_add_duty = mocker.patch.object(duties_store, "add_duty", return_value=duty)
     created_duty = duties_controller.create_duty(1, "Test Description", ["Knowledge", "Skills", "Behaviours"])
 
@@ -30,6 +31,12 @@ def test_can_add_a_duty_to_the_duties_store_if_duty_number_is_unique(mocker, dut
     assert created_duty.description == "Test Description"
     assert created_duty.ksbs == ["Knowledge", "Skills", "Behaviours"]
     assert created_duty.complete is False
+
+def test_cannot_add_duty_if_duty_number_is_not_an_integer(mocker, duties_controller):
+    mocked_add_duty = mocker.patch.object(duties_store, "add_duty")
+    failed_created_duty = duties_controller.create_duty("Invalid Duty Number", "Test Description", ["K", "S", "B"])
+    assert failed_created_duty == None
+    mocked_add_duty.assert_not_called()
 
 def test_does_not_add_duties_with_duplicate_numbers_to_duties_store(mocker, duty, duties_controller):
     mocker.patch.object(duties_store, "add_duty", side_effect=[duty, None])
@@ -47,13 +54,13 @@ def test_can_delete_a_duty(mocker, duties_controller):
 
     mocked_delete.assert_called_once_with(1)
 
-def test_controller_can_get_a_duty(mocker, duties_controller):
-    mocked_get_duty = mocker.patch.object(duties_store, "get_duty", return_value="mocked duty")
+def test_controller_can_get_a_duty(mocker, duties_controller, duty):
+    mocked_get_duty = mocker.patch.object(duties_store, "get_duty", return_value=duty)
 
     result = duties_controller.get_duty(1)
 
     mocked_get_duty.assert_called_once_with(1)
-    assert result == "mocked duty"
+    assert result == duty
 
 def test_controller_can_edit_a_duty(mocker, duties_controller):
     mocked_edit_duty = mocker.patch.object(duties_store, "edit_duty", return_value="updated duty")

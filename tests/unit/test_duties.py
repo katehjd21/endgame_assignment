@@ -62,12 +62,16 @@ def test_delete_nonexistent_duty_does_nothing(duties, duty1):
     assert 1 in all_duty_numbers
     assert len(all_duty_numbers) == 1
 
-def test_get_duty_returns_correct_duty(duties, duty1):
+def test_get_duty_returns_correct_duty(duties, duty1, duty2):
     duties.add_duty(duty1)
+    duties.add_duty(duty2)
     retrieved_duty = duties.get_duty(1)
+    other_retrieved_duty = duties.get_duty(2)
 
     assert retrieved_duty is duty1
     assert retrieved_duty.description == "Test description 1"
+    assert other_retrieved_duty is duty2
+    assert other_retrieved_duty.description == "Test description 2"
 
 def test_get_duty_returns_none_if_not_found(duties):
     assert duties.get_duty(999) is None

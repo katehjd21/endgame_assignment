@@ -20,6 +20,19 @@ describe('Automate Duties Page', () => {
         cy.contains('th', 'Status')
     })
 
+    it('only allows the user to input an integer for the duty number and prevents submission of a non-integer duty number', () => {
+        cy.visit('/automate');
+
+        cy.get('input[name="number"]').type('abc'); 
+        cy.get('input[name="description"]').type('Test Description');
+        cy.get('input[name="ksbs"]').type('Knowledge, Skills, Behaviours');
+
+        cy.get('.add-duty-button').click();
+
+        cy.contains('.error', 'Duty number must be a whole number (e.g. 1, 2, 3).')
+        cy.contains('td', 'abc').should('not.exist');
+    });
+
 
     it('allows the user to add a new duty and displays this in the Automate Duties table', () => {
         cy.visit('/automate')
