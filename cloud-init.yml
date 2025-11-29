@@ -1,0 +1,16 @@
+#cloud-config
+package_update: true
+packages:
+  - docker.io
+  - git
+
+runcmd:
+  - systemctl enable docker
+  - systemctl start docker
+  - sleep 5
+  - git clone https://github.com/katehjd21/testing-pyramid-assignment.git /home/ubuntu/app
+  - cd /home/ubuntu/app || exit 1
+  - docker build -t testing-pyramid-app .
+  - docker rm -f myapp || true
+  - docker run -d --restart always -p 80:8080 --name myapp testing-pyramid-app
+

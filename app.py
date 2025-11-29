@@ -80,4 +80,7 @@ def edit_duty(number):
 def reset_duties():
     DutiesController.reset_duties()
     return redirect(url_for('automate_page'))
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080)
  
