@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/coins.css') }}">
     <title>Apprenticeship Coins</title>
 </head>
 <body>
     <h1>Apprenticeship Coins</h1>
-    <ul>
+    <ul class="coins-list">
         {% for coin in coins %}
-          <li>
+          <li class="single-coin">
             {% if coin.name == "Automate" %}
-            <a href="{{ url_for('automate_page') }}">{{ coin.name }}</a>
+            <a href="{{ url_for('automate_page') }}" class="coin-name">{{ coin.name }}</a>
             {% else %}
                 {{ coin.name }}
             {% endif %}

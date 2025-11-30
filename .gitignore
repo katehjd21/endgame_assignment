@@ -8,3 +8,4 @@ __pycache__
 pytest.ini
 node_modules/
 .DS_Store
+htmlcov

@@ -50,8 +50,8 @@
                         <button type="submit" class="delete-btn">Delete</button>
                     </form>
 
-                    <form method="GET" action="{{ url_for('edit_duty', number=duty.number) }}">
-                        <button type="submit">Edit</button>
+                    <form method="GET" action="{{ url_for('edit_duty', number=duty.number) }}" class="inline-form">
+                        <button type="submit" class="edit-btn">Edit</button>
                     </form>
                 </td>
             </tr>
@@ -63,15 +63,15 @@
         <h2>Add a New Duty</h2>
         <form action="{{ url_for('add_automate_duty') }}" method="post">
             <label>Duty Number: 
-                <input type="text" name="number" required/>
+                <input type="text" name="number" class="text-input" required/>
             </label>
 
             <label>Duty Description: 
-                <input type="text" name="description" required/>
+                <input type="text" name="description" class="text-input"/>
             </label>
 
             <label>Knowledge, Skills, and Behaviours (separate with a comma): 
-                <input type="text" name="ksbs" required/>
+                <input type="text" name="ksbs" class="text-input"/>
             </label>
 
             <button class="add-duty-button" type="submit">Add Duty</button>
