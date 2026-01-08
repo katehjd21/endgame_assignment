@@ -1,13 +1,16 @@
-FROM python:3.13
+FROM python:3.13-slim
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY backend/ ./backend/
+COPY frontend/ ./frontend/
 
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . .
+COPY backend/requirements.txt ./backend/
+COPY frontend/requirements.txt ./frontend/
+RUN pip install --upgrade pip \
+    && pip install -r backend/requirements.txt \
+    && pip install -r frontend/requirements.txt
 
 EXPOSE 8080
 
-CMD ["python3", "app.py"]
+CMD ["python3", "backend/app.py"]

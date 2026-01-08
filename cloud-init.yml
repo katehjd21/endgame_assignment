@@ -7,8 +7,8 @@ packages:
 runcmd:
   - systemctl enable docker
   - systemctl start docker
-  - git clone https://github.com/katehjd21/testing-pyramid-assignment.git /home/ubuntu/app
-  - cd /home/ubuntu/app 
-  - docker build -t testing-pyramid-app .
-  - docker rm -f myapp || true
-  - docker run -d --restart always -p 80:8080 --name myapp testing-pyramid-app
+  - git clone https://github.com/katehjd21/endgame_assignment.git /home/ubuntu/app
+  - cd /home/ubuntu/app
+  - docker build -t endgame-assignment-app .
+  - docker rm -f endgame-assignment || true
+  - docker run -d --restart always -p 80:8080 --name endgame-assignment endgame-assignment-app
