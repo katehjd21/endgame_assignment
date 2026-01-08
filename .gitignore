@@ -1,11 +1,24 @@
+# Python
 bin/
 lib/
 *.cfg
-__pycache__
+__pycache__/
 .venv/
-.pytest_cache
+.pytest_cache/
 .coverage
 pytest.ini
+htmlcov/
+
+# Node / frontend
 node_modules/
+
+# Environment / IDE
+.env
+.env.*
+.idea/
 .DS_Store
-htmlcov
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
