@@ -27,8 +27,7 @@ jobs:
           python3 -m venv .venv
           source .venv/bin/activate
           python3 -m pip install --upgrade pip
-          pip install -r backend/requirements.txt
-          pip install -r frontend/requirements.txt  
+          pip install -r requirements.txt 
           pip install pytest
 
       - name: Run Backend Tests

@@ -5,11 +5,9 @@ WORKDIR /app
 COPY backend/ ./backend/
 COPY frontend/ ./frontend/
 
-COPY backend/requirements.txt ./backend/
-COPY frontend/requirements.txt ./frontend/
-RUN pip install --upgrade pip \
-    && pip install -r backend/requirements.txt \
-    && pip install -r frontend/requirements.txt
+COPY requirements.txt .
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
 
 EXPOSE 8080
 
