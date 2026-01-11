@@ -4,7 +4,7 @@ from controllers.duties_controller import DutiesController
 
 class TestEditDuty(unittest.TestCase):
     def test_add_edit_duty_feature(self):
-        verify('tests/edit_duty.feature', self)
+        verify('frontend/tests/edit_duty.feature', self)
 
     def step_Given_there_is_a_duty_with_number_1_and_description_Original_Duty_Description_and_KSBs_K_S_B(self):
         r'there is a duty with number 1 and description "Original Duty Description" and KSBs "K, S, B"'

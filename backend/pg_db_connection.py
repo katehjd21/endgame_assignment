@@ -11,4 +11,3 @@ pg_db = PostgresqlDatabase(
     host=os.getenv('HOST'),
     port=int(os.getenv('PORT'))
 )
-
