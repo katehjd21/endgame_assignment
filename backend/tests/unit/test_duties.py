@@ -1,13 +1,8 @@
 from models import Coin, Duty, DutyCoin, Knowledge, Skill, Behaviour, DutyKnowledge, DutySkill, DutyBehaviour
-from pg_db_connection import pg_db
 from backend.utils.helper_functions import clear_tables
 import pytest
 import uuid
 from peewee import IntegrityError
-
-@pytest.fixture(autouse=True)
-def clean_db():
-    clear_tables()
 
 @pytest.fixture
 def duty_with_ksbs():
