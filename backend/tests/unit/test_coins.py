@@ -8,7 +8,7 @@ from peewee import IntegrityError
 def coin_with_single_duty():
 
     coin = Coin.create(name="Automate Coin")
-    duty = Duty.create(name="Duty 1")
+    duty = Duty.create(name="Duty 1", description="Duty 1 Description")
     DutyCoin.create(duty=duty, coin=coin)
 
     return coin
@@ -18,9 +18,9 @@ def coin_with_multiple_duties():
 
     coin = Coin.create(name="Automate Coin")
     duties = [
-        Duty.create(name="Duty 1"),
-        Duty.create(name="Duty 2"),
-        Duty.create(name="Duty 3"),
+        Duty.create(name="Duty 1", description="Duty 1 Description"),
+        Duty.create(name="Duty 2", description="Duty 2 Description"),
+        Duty.create(name="Duty 3", description="Duty 3 Description"),
     ]
 
     for duty in duties:
@@ -41,6 +41,7 @@ def test_coin_has_one_duty(coin_with_single_duty):
         duties.append(duty_coin.duty)
     assert len(duties) == 1
     assert duties[0].name == "Duty 1"
+    assert duties[0].description == "Duty 1 Description"
 
 
 def test_coin_has_multiple_duties(coin_with_multiple_duties):
@@ -50,12 +51,15 @@ def test_coin_has_multiple_duties(coin_with_multiple_duties):
         duties.append(duty_coin.duty)
     assert len(duties) == 3
     assert duties[0].name == "Duty 1"
+    assert duties[0].description == "Duty 1 Description"
     assert duties[1].name == "Duty 2"
+    assert duties[1].description == "Duty 2 Description"
     assert duties[2].name == "Duty 3"
+    assert duties[2].description == "Duty 3 Description"
 
 
 def test_multiple_coins_can_have_same_duty():
-    duty = Duty.create(name="Duty 4")
+    duty = Duty.create(name="Duty 4", description="Duty 4 Description")
     assembleCoin = Coin.create(name="Assemble Coin")
     securityCoin = Coin.create(name="Security Coin")
     
@@ -86,7 +90,7 @@ def test_coin_name_is_unique():
 
 
 def test_duplicate_coin_duty():
-    duty = Duty.create(name="Duty 1")
+    duty = Duty.create(name="Duty 1", description="Duty 1 Description")
     coin = Coin.create(name="Automate Coin")
     
     DutyCoin.create(duty=duty, coin=coin)
@@ -104,7 +108,7 @@ def test_update_coin_name(coin_with_single_duty):
 
 
 def test_deleting_coin_cleans_dutycoin_junction_table():
-    duty = Duty.create(name="Duty 4")
+    duty = Duty.create(name="Duty 4", description="Duty 4 Description")
     coin = Coin.create(name="Going Deeper Coin")
     DutyCoin.create(duty=duty, coin=coin)
     

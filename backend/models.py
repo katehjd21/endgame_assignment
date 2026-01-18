@@ -14,18 +14,22 @@ class Coin(BaseModel):
 class Duty(BaseModel):
     id = UUIDField(primary_key=True, default=uuid.uuid4)
     name = CharField(unique=True, null = False)
+    description = TextField(null=True)
 
 class Knowledge(BaseModel):
     id = UUIDField(primary_key=True, default=uuid.uuid4)
     name = CharField(unique=True)
+    description = TextField(null=True)
 
 class Skill(BaseModel):
     id = UUIDField(primary_key=True, default=uuid.uuid4)
     name = CharField(unique=True)
+    description = TextField(null=True)
 
 class Behaviour(BaseModel):
     id = UUIDField(primary_key=True, default=uuid.uuid4)
     name = CharField(unique=True)
+    description = TextField(null=True)
 
 
 # Junction Tables

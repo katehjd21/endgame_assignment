@@ -6,10 +6,10 @@ from utils.helper_functions import clear_tables
 
 @pytest.fixture
 def duty_with_ksbs():
-    duty = Duty.create(name="Duty 1")
-    knowledge = Knowledge.create(name="Knowledge 1")
-    skill = Skill.create(name="Skill 1")
-    behaviour = Behaviour.create(name="Behaviour 1")
+    duty = Duty.create(name="Duty 1", description="Duty 1 Description")
+    knowledge = Knowledge.create(name="Knowledge 1", description="Knowledge 1 Description")
+    skill = Skill.create(name="Skill 1", description="Skill 1 Description")
+    behaviour = Behaviour.create(name="Behaviour 1", description="Behaviour 1 Description")
 
     DutyKnowledge.create(duty=duty, knowledge=knowledge)
     DutySkill.create(duty=duty, skill=skill)
@@ -42,20 +42,20 @@ def test_ksbs_id_is_non_integer(duty_with_ksbs):
         assert isinstance(behaviour.id, uuid.UUID)
 
 def test_knowledge_name_is_unique():
-    Knowledge.create(name="Knowledge 1")
+    Knowledge.create(name="Knowledge 1", description="Knowledge 1 Description")
     with pytest.raises(IntegrityError):
-        Knowledge.create(name="Knowledge 1")
+        Knowledge.create(name="Knowledge 1", description="Knowledge 1 Description")
 
 def test_skill_name_is_unique():
-    Skill.create(name="Skill 1")
+    Skill.create(name="Skill 1", description="Skill 1 Description")
     with pytest.raises(IntegrityError):
-        Skill.create(name="Skill 1")
+        Skill.create(name="Skill 1", description="Skill 1 Description")
 
 
 def test_behaviour_name_is_unique():
-    Behaviour.create(name="Behaviour 1")
+    Behaviour.create(name="Behaviour 1", description="Behaviour 1 Description")
     with pytest.raises(IntegrityError):
-        Behaviour.create(name="Behaviour 1")
+        Behaviour.create(name="Behaviour 1", description="Behaviour 1 Description")
 
 
 def test_duty_has_all_ksbs(duty_with_ksbs):
@@ -65,21 +65,27 @@ def test_duty_has_all_ksbs(duty_with_ksbs):
     assert len(list(duty.duty_behaviours)) == 1
 
 def test_skill_name_is_unique():
-    Skill.create(name="Skill 1")
+    Skill.create(name="Skill 1", description="Skill 1 Description")
     with pytest.raises(IntegrityError):
-        Skill.create(name="Skill 1")
+        Skill.create(name="Skill 1", description="Skill 1 Description")
 
 
 def test_behaviour_name_is_unique():
-    Behaviour.create(name="Behaviour 1")
+    Behaviour.create(name="Behaviour 1", description="Behaviour 1 Description")
     with pytest.raises(IntegrityError):
-        Behaviour.create(name="Behaviour 1")
+        Behaviour.create(name="Behaviour 1", description="Behaviour 1 Description")
 
 def test_update_knowledge_name(duty_with_ksbs):
     knowledge = list(duty_with_ksbs.duty_knowledges)[0].knowledge
     knowledge.name = "Updated Knowledge Name"
     knowledge.save()
     assert Knowledge.get_by_id(knowledge.id).name == "Updated Knowledge Name"
+
+def test_update_knowledge_description(duty_with_ksbs):
+    knowledge = list(duty_with_ksbs.duty_knowledges)[0].knowledge
+    knowledge.description = "Updated Knowledge Description"
+    knowledge.save()
+    assert Knowledge.get_by_id(knowledge.id).description == "Updated Knowledge Description"
 
 def test_deleting_knowledge_cleans_junction(duty_with_ksbs):
     knowledge = list(duty_with_ksbs.duty_knowledges)[0].knowledge

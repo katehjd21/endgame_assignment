@@ -4,8 +4,8 @@ import uuid
 
 @pytest.fixture
 def duties():
-    duty1 = Duty.create(name="Duty 1")
-    duty2 = Duty.create(name="Duty 2")
+    duty1 = Duty.create(name="Duty 1", description="Duty 1 Description")
+    duty2 = Duty.create(name="Duty 2", description="Duty 2 Description")
     return [duty1, duty2]
 
 @pytest.fixture
@@ -36,13 +36,20 @@ def test_get_duties_returns_all_duties(client, duties):
         assert duty.name in returned_duty_names
     
 
-def test_duties_have_id_and_name(client, duties):
+def test_duties_have_id_name_and_description(client, duties):
     response = client.get("/duties")
     data = response.json
 
     for duty in data:
-        assert "id" in duty
-        assert "name" in duty
+        assert set(duty.keys()) == {"id", "name", "description"}
+
+def test_get_duties_returns_correct_duty_descriptions(client, duties):
+    response = client.get("/duties")
+    data = response.json
+
+    duty_names = {duty["name"]: duty["description"] for duty in data}
+    assert duty_names["Duty 1"] == "Duty 1 Description"
+    assert duty_names["Duty 2"] == "Duty 2 Description"
 
 def test_duties_have_non_integer_id(client, duties):
     response = client.get("/duties")
@@ -81,12 +88,20 @@ def test_get_duty_by_id_returns_its_associated_coins(client, duties, coins_with_
     assert "Going Deeper Coin" in duty2_coin_names
     assert len(duty2_coin_names) == 3
 
+def test_get_duty_by_id_returns_duty_name_and_description(client, duties, coins_with_duties):
+    duty_id = duties[0].id
+    response = client.get(f"/duties/{duty_id}")
+    data = response.json
+
+    assert data["name"] == "Duty 1"
+    assert data["description"] == "Duty 1 Description"
+
 def test_get_duty_by_id_only_returns_expected_fields(client, duties, coins_with_duties):
     duty_id = duties[0].id
     response = client.get(f"/duties/{duty_id}")
     data = response.json
 
-    assert set(data.keys()) == {"id", "name", "coins"}
+    assert set(data.keys()) == {"id", "name", "description", "coins"}
 
 def test_duty_coins_return_id_and_name_of_coins(client, duties, coins_with_duties):
     duty_id = duties[0].id
