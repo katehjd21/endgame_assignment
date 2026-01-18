@@ -10,10 +10,15 @@ def duties():
 
 @pytest.fixture
 def coins_with_duties(duties):
-    coin = Coin.create(name="Automate Coin")
-    DutyCoin.create(duty=duties[0], coin=coin)
-    DutyCoin.create(duty=duties[1], coin=coin)
-    return coin
+    coin1 = Coin.create(name="Automate Coin")
+    coin2 = Coin.create(name="Assemble Coin")
+    coin3 = Coin.create(name="Going Deeper Coin")
+    DutyCoin.create(duty=duties[0], coin=coin1)
+    DutyCoin.create(duty=duties[0], coin=coin2)
+    DutyCoin.create(duty=duties[1], coin=coin1)
+    DutyCoin.create(duty=duties[1], coin=coin2)
+    DutyCoin.create(duty=duties[1], coin=coin3)
+    return [coin1, coin2, coin3]
 
 
 # GET DUTIES
@@ -53,3 +58,50 @@ def test_get_duties_has_no_duplicates(client, duties):
     duty_names = [duty["name"] for duty in data]
 
     assert len(duty_names) == len(set(duty_names))
+
+
+# GET DUTY BY ID WITH ASSOCIATED COINS
+
+def test_get_duty_by_id_returns_its_associated_coins(client, duties, coins_with_duties):
+    duty1_id = duties[0].id
+    duty1_response = client.get(f"/duties/{duty1_id}")
+    duty1_coin_names = [duty1_coin["name"] for duty1_coin in duty1_response.json["coins"]]
+
+    assert "Automate Coin" in duty1_coin_names
+    assert "Assemble Coin" in duty1_coin_names
+    assert "Going Deeper Coin" not in duty1_coin_names
+    assert len(duty1_coin_names) == 2
+
+    duty2_id = duties[1].id
+    duty2_response = client.get(f"/duties/{duty2_id}")
+    duty2_coin_names = [duty2_coin["name"] for duty2_coin in duty2_response.json["coins"]]
+
+    assert "Automate Coin" in duty2_coin_names
+    assert "Assemble Coin" in duty2_coin_names
+    assert "Going Deeper Coin" in duty2_coin_names
+    assert len(duty2_coin_names) == 3
+
+def test_get_duty_by_id_only_returns_expected_fields(client, duties, coins_with_duties):
+    duty_id = duties[0].id
+    response = client.get(f"/duties/{duty_id}")
+    data = response.json
+
+    assert set(data.keys()) == {"id", "name", "coins"}
+
+def test_duty_coins_return_id_and_name_of_coins(client, duties, coins_with_duties):
+    duty_id = duties[0].id
+    response = client.get(f"/duties/{duty_id}")
+    coin = response.json["coins"][0]
+
+    assert set(coin.keys()) == {"id", "name"}
+
+def test_get_duty_by_id_returns_400_if_invalid_id(client):
+    response = client.get("/duties/invalid_id")
+
+    assert response.status_code == 400
+    assert response.json["description"] == "Invalid Duty ID format. Duty ID must be a UUID (non-integer)."
+
+def test_get_duty_by_id_returns_404_if_not_found(client):
+    response = client.get("/duties/00000000-0000-0000-0000-000000000000")
+    assert response.status_code == 404
+    assert response.json["description"] == "Duty not found."

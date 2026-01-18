@@ -117,7 +117,7 @@ def delete_coin(coin_id):
     return "", 204
 
 
-# DUTIES
+# GET DUTIES
 @app.get("/duties")
 def get_duties():
     duties = Duty.select()
@@ -129,6 +129,31 @@ def get_duties():
         duty_dicts.append(duty_dict)
 
     return jsonify(duty_dicts), 200
+
+# GET DUTY BY ID WITH ASSOCIATED COINS
+@app.get("/duties/<duty_id>")
+def get_duty_by_id(duty_id):
+    try:
+        uuid_obj = uuid.UUID(duty_id)
+    except ValueError:
+        abort(400, description="Invalid Duty ID format. Duty ID must be a UUID (non-integer).")
+
+    try:
+        duty = Duty.get_by_id(uuid_obj)
+    except Duty.DoesNotExist:
+        abort(404, description="Duty not found.")
+
+    duty_dict = model_to_dict(duty)
+    duty_dict["id"] = str(duty.id)
+
+    coins = []
+    for duty_coin in duty.duty_coins:
+        coins.append({"id": str(duty_coin.coin.id), "name": duty_coin.coin.name})
+
+    duty_dict["coins"] = coins
+
+    return jsonify(duty_dict), 200
+
 
 
 if __name__ == '__main__':

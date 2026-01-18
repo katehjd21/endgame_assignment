@@ -86,8 +86,7 @@ def test_get_coin_by_id_only_returns_id_and_name(client, coins):
     response = client.get(f"/coins/{coin_id}")
     data = response.json
 
-    assert "id" in data
-    assert "name" in data
+    assert set(data.keys()) == {"id", "name"}
     assert len(data) == 2
 
 def test_get_coin_by_id_returns_correct_coin(client, coins):
