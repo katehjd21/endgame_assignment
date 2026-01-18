@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, abort, request
-from models import Coin
+from models import Coin, Duty
 from playhouse.shortcuts import model_to_dict
 import uuid
 
@@ -15,6 +15,7 @@ def not_found(error):
     return jsonify({"description": error.description}), 404
 
 
+# COINS
 @app.get("/coins")
 def get_coins():
     coins = Coin.select()
@@ -114,6 +115,20 @@ def delete_coin(coin_id):
     coin.delete_instance()
 
     return "", 204
+
+
+# DUTIES
+@app.get("/duties")
+def get_duties():
+    duties = Duty.select()
+
+    duty_dicts = []
+    for duty in duties:
+        duty_dict = model_to_dict(duty)
+        duty_dict["id"] = str(duty_dict["id"])
+        duty_dicts.append(duty_dict)
+
+    return jsonify(duty_dicts), 200
 
 
 if __name__ == '__main__':
