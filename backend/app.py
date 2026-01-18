@@ -96,5 +96,25 @@ def update_coin(coin_id):
     return jsonify(coin_dict), 200
 
 
+@app.delete("/coins/<coin_id>")
+def delete_coin(coin_id):
+    try:
+        uuid_obj = uuid.UUID(coin_id)
+    except ValueError:
+        abort(
+            400,
+            description="Invalid Coin ID format. Coin ID must be a UUID (non-integer)."
+        )
+
+    try:
+        coin = Coin.get_by_id(uuid_obj)
+    except Coin.DoesNotExist:
+        abort(404, description="Coin not found.")
+
+    coin.delete_instance()
+
+    return "", 204
+
+
 if __name__ == '__main__':
     app.run(debug=True)

@@ -142,7 +142,7 @@ def test_patch_coin_updates_coin_name(client, coins):
     data = response.json
 
     assert response.status_code == 200
-    assert data["name"] == "Updated Coin Name"
+    assert data["name"] == "Updated Coin Name"    
 
 def test_patch_coin_returns_400_if_missing_name_key(client, coins):
     coin_id = coins[0].id
@@ -174,6 +174,30 @@ def test_patch_coin_returns_400_if_invalid_id(client):
 
 def test_patch_coin_returns_404_if_not_found(client):
     response = client.patch("/coins/00000000-0000-0000-0000-000000000000", json={"name": "Updated Coin Name"})
-    assert response.json["description"] == "Coin not found."
 
     assert response.status_code == 404
+    assert response.json["description"] == "Coin not found."
+
+   
+# DELETE COIN
+
+def test_delete_coin_removes_coin_from_database(client, coins):
+    coin_id = coins[4].id
+    response = client.delete(f"/coins/{coin_id}")
+
+    assert response.status_code == 204
+
+    get_response = client.get(f"/coins/{coin_id}")
+    assert get_response.status_code == 404
+
+def test_delete_coin_returns_400_if_invalid_id(client):
+    response = client.delete("/coins/invalid_id")
+
+    assert response.status_code == 400
+    assert response.json["description"] == ("Invalid Coin ID format. Coin ID must be a UUID (non-integer).")
+
+def test_delete_coin_returns_404_if_not_found(client):
+    response = client.delete("/coins/00000000-0000-0000-0000-000000000000")
+
+    assert response.status_code == 404
+    assert response.json["description"] == "Coin not found."
