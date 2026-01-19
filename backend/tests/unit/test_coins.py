@@ -112,9 +112,8 @@ def test_deleting_coin_cleans_dutycoin_junction_table():
     coin = Coin.create(name="Going Deeper Coin")
     DutyCoin.create(duty=duty, coin=coin)
     
-    coin.delete_instance(recursive=True)  
+    coin.delete_instance()  
     
     assert Coin.select().where(Coin.id == coin.id).count() == 0
     assert Duty.select().where(Duty.id == duty.id).count() == 1
     assert DutyCoin.select().where(DutyCoin.coin == coin.id).count() == 0
-

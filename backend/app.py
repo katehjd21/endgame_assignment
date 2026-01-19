@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, abort, request
-from models import Coin, Duty
+from models import Coin, Duty, Knowledge, Skill, Behaviour
 from playhouse.shortcuts import model_to_dict
 import uuid
 
@@ -154,6 +154,34 @@ def get_duty_by_id(duty_id):
 
     return jsonify(duty_dict), 200
 
+# GET KSBS
+@app.get("/ksbs")
+def get_ksbs():
+    knowledges = Knowledge.select()
+    skills = Skill.select()
+    behaviours = Behaviour.select()
+
+    ksbs = []
+
+    for knowledge in knowledges:
+        knowledge_dict = model_to_dict(knowledge)
+        knowledge_dict["id"] = str(knowledge.id)
+        knowledge_dict["type"] = "Knowledge"
+        ksbs.append(knowledge_dict)
+
+    for skill in skills:
+        skill_dict = model_to_dict(skill)
+        skill_dict["id"] = str(skill.id)
+        skill_dict["type"] = "Skill"
+        ksbs.append(skill_dict)
+
+    for behaviour in behaviours:
+        behaviour_dict = model_to_dict(behaviour)
+        behaviour_dict["id"] = str(behaviour.id)
+        behaviour_dict["type"] = "Behaviour"
+        ksbs.append(behaviour_dict)
+
+    return jsonify(ksbs), 200
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 import pytest
-from models import Duty, Coin, DutyCoin
+from models import Duty, Knowledge, Skill, Behaviour, Coin, DutyCoin, DutyKnowledge, DutySkill, DutyBehaviour
 import uuid
 
 @pytest.fixture
@@ -120,3 +120,20 @@ def test_get_duty_by_id_returns_404_if_not_found(client):
     response = client.get("/duties/00000000-0000-0000-0000-000000000000")
     assert response.status_code == 404
     assert response.json["description"] == "Duty not found."
+
+def test_deleting_duty_cascades_all_ksb_junction_tables():
+    duty = Duty.create(name="Duty 3", description="Duty 3 Description")
+    knowledge = Knowledge.create(name="Knowledge 3", description="Knowledge 3 Description")
+    skill = Skill.create(name="Skill 3", description="Skill 3 Description")
+    behaviour = Behaviour.create(name="Behaviour 3", description="Behaviour 3 Description")
+
+    DutyKnowledge.create(duty=duty, knowledge=knowledge)
+    DutySkill.create(duty=duty, skill=skill)
+    DutyBehaviour.create(duty=duty, behaviour=behaviour)
+
+    duty.delete_instance()  
+
+    assert Duty.select().where(Duty.id == duty.id).count() == 0
+    assert DutyKnowledge.select().where(DutyKnowledge.duty == duty).count() == 0
+    assert DutySkill.select().where(DutySkill.duty == duty).count() == 0
+    assert DutyBehaviour.select().where(DutyBehaviour.duty == duty).count() == 0

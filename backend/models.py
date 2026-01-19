@@ -35,26 +35,26 @@ class Behaviour(BaseModel):
 # Junction Tables
 
 class DutyCoin(BaseModel):
-    duty = ForeignKeyField(Duty, backref="duty_coins")
-    coin = ForeignKeyField(Coin, backref="coin_duties")
+    duty = ForeignKeyField(Duty, backref="duty_coins", on_delete="CASCADE")
+    coin = ForeignKeyField(Coin, backref="coin_duties", on_delete="CASCADE")
     class Meta:
         constraints = [SQL('UNIQUE(duty_id, coin_id)')]
 
 class DutyKnowledge(BaseModel):
-    duty = ForeignKeyField(Duty, backref="duty_knowledges")
-    knowledge = ForeignKeyField(Knowledge, backref="knowledge_duties")
+    duty = ForeignKeyField(Duty, backref="duty_knowledges", on_delete="CASCADE")
+    knowledge = ForeignKeyField(Knowledge, backref="knowledge_duties", on_delete="CASCADE")
     class Meta:
         constraints = [SQL('UNIQUE(duty_id, knowledge_id)')]
 
 class DutySkill(BaseModel):
-    duty = ForeignKeyField(Duty, backref="duty_skills")
-    skill = ForeignKeyField(Skill, backref="skill_duties")
+    duty = ForeignKeyField(Duty, backref="duty_skills", on_delete="CASCADE")
+    skill = ForeignKeyField(Skill, backref="skill_duties", on_delete="CASCADE")
     class Meta:
         constraints = [SQL('UNIQUE(duty_id, skill_id)')]
 
 class DutyBehaviour(BaseModel):
-    duty = ForeignKeyField(Duty, backref="duty_behaviours")
-    behaviour = ForeignKeyField(Behaviour, backref="behaviour_duties")
+    duty = ForeignKeyField(Duty, backref="duty_behaviours", on_delete="CASCADE")
+    behaviour = ForeignKeyField(Behaviour, backref="behaviour_duties", on_delete="CASCADE")
     class Meta:
         constraints = [SQL('UNIQUE(duty_id, behaviour_id)')]
 
