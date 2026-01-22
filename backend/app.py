@@ -183,6 +183,53 @@ def get_ksbs():
 
     return jsonify(ksbs), 200
 
+# GET KSB BY ID WITH ASSOCIATED DUTIES
+@app.get("/ksbs/<ksb_id>")
+def get_ksb_by_id(ksb_id):
+    try:
+        uuid_obj = uuid.UUID(ksb_id)
+    except ValueError:
+        abort(400, description="Invalid KSB ID format. KSB ID must be a UUID (non-integer).")
+    
+    ksb = None
+    ksb_type = None
+
+    for model, ksb_type_name in [
+        (Knowledge, "Knowledge"),
+        (Skill, "Skill"),
+        (Behaviour, "Behaviour"),
+    ]:
+        try:
+            ksb = model.get_by_id(uuid_obj)
+            ksb_type = ksb_type_name
+            break
+        except model.DoesNotExist:
+            ksb = None
+
+    if not ksb:
+        abort(404, description="KSB not found.")
+
+    ksb_dict = model_to_dict(ksb)
+    ksb_dict["id"] = str(ksb.id)
+    ksb_dict["type"] = ksb_type
+
+    duties = []
+
+    if ksb_type == "Knowledge":
+        for knowledge_duty in ksb.knowledge_duties:
+            duties.append({"id": str(knowledge_duty.duty.id), "name": knowledge_duty.duty.name})
+
+    elif ksb_type == "Skill":
+        for skill_duties in ksb.skill_duties:
+            duties.append({"id": str(skill_duties.duty.id), "name": skill_duties.duty.name})
+
+    elif ksb_type == "Behaviour":
+        for behaviour_duty in ksb.behaviour_duties:
+            duties.append({"id": str(behaviour_duty.duty.id), "name": behaviour_duty.duty.name})
+
+    ksb_dict["duties"] = duties
+
+    return jsonify(ksb_dict), 200
 
 if __name__ == '__main__':
     app.run(debug=True)

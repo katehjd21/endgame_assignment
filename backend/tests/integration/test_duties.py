@@ -88,6 +88,12 @@ def test_get_duty_by_id_returns_its_associated_coins(client, duties, coins_with_
     assert "Going Deeper Coin" in duty2_coin_names
     assert len(duty2_coin_names) == 3
 
+def test_get_duty_by_id_returns_empty_coins_when_none_associated(client):
+    duty = Duty.create(name="Duty 10", description="No Coins")
+    response = client.get(f"/duties/{duty.id}")
+    assert response.status_code == 200
+    assert response.json["coins"] == []
+
 def test_get_duty_by_id_returns_duty_name_and_description(client, duties, coins_with_duties):
     duty_id = duties[0].id
     response = client.get(f"/duties/{duty_id}")
