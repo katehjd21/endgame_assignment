@@ -1,5 +1,5 @@
 import pytest
-from models import Coin
+from models import Coin, Duty, DutyCoin
 import uuid
 
 @pytest.fixture
@@ -16,6 +16,19 @@ def coins():
         coins.append(Coin.create(name=name))
 
     return coins
+
+@pytest.fixture
+def duties():
+    duty_names = [
+        "Duty 1",
+        "Duty 2",
+        "Duty 3"
+    ]
+    duties = []
+    for name in duty_names:
+        duties.append(Duty.create(name=name, description=f"{name} Description"))
+
+    return duties
 
 
 # GET COINS
@@ -68,6 +81,27 @@ def test_get_coin_by_id(client, coins):
     assert data["id"] == str(coin_id)
     assert data["name"] == coins[0].name
 
+def test_get_coin_by_id_returns_associated_duties(client, coins, duties):
+    coin = coins[0]
+    duty = duties[0]
+
+    DutyCoin.create(duty=duty, coin=coin)
+
+    response = client.get(f"/coins/{coin.id}")
+    data = response.json
+
+    assert response.status_code == 200
+    assert "duties" in data
+    assert data["duties"] == [{"id": str(duty.id), "name": duty.name}]
+
+def test_get_coin_by_id_returns_empty_duties_list_if_none(client, coins):
+    coin = coins[0]
+    response = client.get(f"/coins/{coin.id}")
+    data = response.json
+
+    assert response.status_code == 200
+    assert data["duties"] == []
+
 
 def test_get_coin_by_id_not_found(client):
     response = client.get("/coins/00000000-0000-0000-0000-000000000000")
@@ -108,8 +142,20 @@ def test_post_coin_creates_coin(client):
     assert data["name"] == "New Coin"
     uuid.UUID(data["id"])
 
+def test_post_coin_creates_coin_with_duties(client, duties):
+    duty_ids = [str(duty.id) for duty in duties[:2]]
+
+    response = client.post("/coins", json={
+        "name": "New Coin With Duties",
+        "duty_ids": duty_ids
+    })
+
+    data = response.json
+    assert response.status_code == 201
+    assert len(data["duties"]) == 2
+
 def test_post_coin_returns_400_if_name_key_missing(client):
-    response = client.post("/coins", json={})
+    response = client.post("/coins", json=None)
 
     assert response.status_code == 400
     assert response.json["description"] == "Missing 'name' key in request body."
@@ -141,7 +187,21 @@ def test_patch_coin_updates_coin_name(client, coins):
     data = response.json
 
     assert response.status_code == 200
-    assert data["name"] == "Updated Coin Name"    
+    assert data["name"] == "Updated Coin Name" 
+
+def test_patch_coin_updates_duties(client, coins, duties):
+    coin = coins[0]
+
+    DutyCoin.create(duty=duties[0], coin=coin)
+
+    response = client.patch(f"/coins/{coin.id}", json={
+        "duty_ids": [str(duties[1].id)]
+    })
+
+    data = response.json
+    assert response.status_code == 200
+    assert len(data["duties"]) == 1
+    assert data["duties"][0]["id"] == str(duties[1].id)   
 
 def test_patch_coin_returns_400_if_missing_name_key(client, coins):
     coin_id = coins[0].id
@@ -170,6 +230,15 @@ def test_patch_coin_returns_400_if_invalid_id(client):
 
     assert response.status_code == 400
     assert response.json["description"] == "Invalid Coin ID format. Coin ID must be a UUID (non-integer)."
+
+def test_patch_coin_returns_400_for_invalid_duty_id(client, coins):
+    coin = coins[0]
+
+    response = client.patch(f"/coins/{coin.id}", json={
+        "duty_ids": ["invalid-uuid"]
+    })
+
+    assert response.status_code == 400
 
 def test_patch_coin_returns_404_if_not_found(client):
     response = client.patch("/coins/00000000-0000-0000-0000-000000000000", json={"name": "Updated Coin Name"})

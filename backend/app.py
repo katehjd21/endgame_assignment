@@ -1,7 +1,8 @@
 from flask import Flask, jsonify, abort, request
-from models import Coin, Duty, Knowledge, Skill, Behaviour
+from models import Coin, Duty, Knowledge, Skill, Behaviour, DutyCoin
 from playhouse.shortcuts import model_to_dict
 import uuid
+import re
 
 
 app = Flask(__name__)
@@ -43,6 +44,13 @@ def get_coin_by_id(coin_id):
 
     coin_dict = model_to_dict(coin)
     coin_dict["id"] = str(coin.id)
+
+    duties = []
+    for duty_coin in coin.coin_duties:
+        duties.append({"id": str(duty_coin.duty.id), "name": duty_coin.duty.name})
+
+    coin_dict["duties"] = duties
+
     return jsonify(coin_dict), 200
 
 
@@ -62,6 +70,15 @@ def create_coin():
         abort(400, description="Coin already exists. Please choose another name.")
 
     new_coin = Coin.create(name=name)
+
+    duty_ids = data.get("duty_ids", [])
+    for duty_id in duty_ids:
+        try:
+            duty_uuid = uuid.UUID(duty_id)
+            duty = Duty.get_by_id(duty_uuid)
+            DutyCoin.create(duty=duty, coin=new_coin)
+        except (ValueError, Duty.DoesNotExist):
+            abort(400, description=f"Invalid duty_id: {duty_id}")
 
     new_coin_dict = model_to_dict(new_coin)
     new_coin_dict["id"] = str(new_coin_dict["id"])
@@ -83,17 +100,40 @@ def update_coin(coin_id):
     name = data["name"].strip()
     if not name:
         abort(400, description="Coin name cannot be empty.")
+    
+    duty_ids = data.get("duty_ids")
+    if duty_ids is not None and not isinstance(duty_ids, list):
+        abort(400, description="duty_ids must be a list of UUID strings.")
 
     try:
         coin = Coin.get_by_id(uuid_obj)
     except Coin.DoesNotExist:
         abort(404, description="Coin not found.")
 
-    coin.name = name
-    coin.save()
+    if name is not None:
+        coin.name = name
+        coin.save()
+    
+    if duty_ids is not None:
+        DutyCoin.delete().where(DutyCoin.coin == coin).execute()
+    
+    for duty_id in duty_ids:
+            try:
+                duty_uuid = uuid.UUID(duty_id)
+                duty = Duty.get_by_id(duty_uuid)
+                DutyCoin.create(duty=duty, coin=coin)
+            except (ValueError, Duty.DoesNotExist):
+                abort(400, description=f"Invalid duty_id: {duty_id}")
 
     coin_dict = model_to_dict(coin)
     coin_dict["id"] = str(coin_dict["id"])
+
+    duties = []
+    for duty_coin in coin.coin_duties:
+        duties.append({"id": str(duty_coin.duty.id), "name": duty_coin.duty.name})
+
+    coin_dict["duties"] = duties
+
     return jsonify(coin_dict), 200
 
 
@@ -131,15 +171,40 @@ def get_duties():
     return jsonify(duty_dicts), 200
 
 # GET DUTY BY ID WITH ASSOCIATED COINS
-@app.get("/duties/<duty_id>")
-def get_duty_by_id(duty_id):
-    try:
-        uuid_obj = uuid.UUID(duty_id)
-    except ValueError:
-        abort(400, description="Invalid Duty ID format. Duty ID must be a UUID (non-integer).")
+# @app.get("/duties/<duty_id>")
+# def get_duty_by_id(duty_id):
+#     try:
+#         uuid_obj = uuid.UUID(duty_id)
+#     except ValueError:
+#         abort(400, description="Invalid Duty ID format. Duty ID must be a UUID (non-integer).")
+
+#     try:
+#         duty = Duty.get_by_id(uuid_obj)
+#     except Duty.DoesNotExist:
+#         abort(404, description="Duty not found.")
+
+#     duty_dict = model_to_dict(duty)
+#     duty_dict["id"] = str(duty.id)
+
+#     coins = []
+#     for duty_coin in duty.duty_coins:
+#         coins.append({"id": str(duty_coin.coin.id), "name": duty_coin.coin.name})
+
+#     duty_dict["coins"] = coins
+
+#     return jsonify(duty_dict), 200
+
+# GET DUTY BY CODE WITH ASSOCIATED COINS
+@app.get("/duties/<duty_code>")
+def get_duty_by_code(duty_code):
+    duty_code = duty_code.upper()
+
+    regex = r"^D\d+$"
+    if not re.match(regex, duty_code):
+        abort(400, description="Invalid Duty Code format. Duty Code must start with a 'D' or 'd' followed by numbers (e.g., D7 or d7).")
 
     try:
-        duty = Duty.get_by_id(uuid_obj)
+        duty = Duty.get(Duty.code == duty_code)
     except Duty.DoesNotExist:
         abort(404, description="Duty not found.")
 
@@ -153,6 +218,7 @@ def get_duty_by_id(duty_id):
     duty_dict["coins"] = coins
 
     return jsonify(duty_dict), 200
+
 
 # GET KSBS
 @app.get("/ksbs")

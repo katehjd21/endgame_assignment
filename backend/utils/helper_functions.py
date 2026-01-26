@@ -1,4 +1,5 @@
 from models import DutyCoin, DutyKnowledge, DutySkill, DutyBehaviour, Coin, Duty, Knowledge, Skill, Behaviour
+import re
 
 def clear_tables():
     tables_to_clear = [
