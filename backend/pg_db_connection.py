@@ -4,6 +4,8 @@ import os
 
 load_dotenv()
 
+database = DatabaseProxy()
+
 pg_db = PostgresqlDatabase(
     os.getenv('DATABASE'),
     user=os.getenv('DB_USERNAME'),
@@ -11,3 +13,5 @@ pg_db = PostgresqlDatabase(
     host=os.getenv('HOST'),
     port=int(os.getenv('PORT'))
 )
+
+TEST_DB = SqliteDatabase(':memory:')

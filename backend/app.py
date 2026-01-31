@@ -1,11 +1,27 @@
 from flask import Flask, jsonify, abort, request
 from models import Coin, Duty, Knowledge, Skill, Behaviour, DutyCoin
+from utils.helper_functions import serialize_coin, serialize_coin_with_duties
 from playhouse.shortcuts import model_to_dict
 import uuid
 import re
+from pg_db_connection import pg_db, database 
+import os
+from peewee import DoesNotExist
 
-
+database.initialize(pg_db)
 app = Flask(__name__)
+
+@app.before_request
+def before_request():
+    if os.getenv("TESTING"):
+        return
+    if pg_db.is_closed(): 
+        pg_db.connect(reuse_if_open=True)
+
+@app.teardown_request
+def teardown_request(exception):
+    if not os.getenv("TESTING") and not pg_db.is_closed():
+        pg_db.close()
 
 @app.errorhandler(400)
 def bad_request(error):
@@ -16,22 +32,23 @@ def not_found(error):
     return jsonify({"description": error.description}), 404
 
 
-# COINS
-@app.get("/coins")
-def get_coins():
+# GET COINS
+@app.get("/v1/coins")
+def get_coins_v1():
     coins = Coin.select()
+    coins_list = [serialize_coin(coin) for coin in coins]
+    return jsonify(coins_list), 200
 
-    coin_dicts = []
-    for coin in coins:
-        coin_dict = model_to_dict(coin)
-        coin_dict["id"] = str(coin_dict["id"])
-        coin_dicts.append(coin_dict)
-
-    return jsonify(coin_dicts), 200
+@app.get("/v2/coins")
+def get_coins_v2():
+    coins = Coin.select()
+    coins_list = [serialize_coin_with_duties(coin) for coin in coins]
+    return jsonify(coins_list), 200
 
 
-@app.get("/coins/<coin_id>")
-def get_coin_by_id(coin_id):
+# GET COIN BY ID
+@app.get("/v1/coins/<coin_id>")
+def get_coin_by_id_v1(coin_id):
     try:
         uuid_obj = uuid.UUID(coin_id)
     except ValueError:
@@ -42,20 +59,29 @@ def get_coin_by_id(coin_id):
     except Coin.DoesNotExist:
         abort(404, description="Coin not found.")
 
-    coin_dict = model_to_dict(coin)
-    coin_dict["id"] = str(coin.id)
-
-    duties = []
-    for duty_coin in coin.coin_duties:
-        duties.append({"id": str(duty_coin.duty.id), "name": duty_coin.duty.name})
-
-    coin_dict["duties"] = duties
-
+    coin_dict = serialize_coin(coin)
     return jsonify(coin_dict), 200
 
 
-@app.post("/coins")
-def create_coin():
+@app.get("/v2/coins/<coin_id>")
+def get_coin_by_id_v2(coin_id):
+    try:
+        uuid_obj = uuid.UUID(coin_id)
+    except ValueError:
+        abort(400, description="Invalid Coin ID format. Coin ID must be a UUID (non-integer).")
+
+    try:
+        coin = Coin.get_by_id(uuid_obj)
+    except Coin.DoesNotExist:
+        abort(404, description="Coin not found.")
+
+    coin_dict = serialize_coin_with_duties(coin)
+    return jsonify(coin_dict), 200
+
+
+# POST COIN
+@app.post("/v1/coins")
+def create_coin_v1():
     data = request.json
 
     if not data or "name" not in data:
@@ -71,23 +97,44 @@ def create_coin():
 
     new_coin = Coin.create(name=name)
 
-    duty_ids = data.get("duty_ids", [])
-    for duty_id in duty_ids:
-        try:
-            duty_uuid = uuid.UUID(duty_id)
-            duty = Duty.get_by_id(duty_uuid)
-            DutyCoin.create(duty=duty, coin=new_coin)
-        except (ValueError, Duty.DoesNotExist):
-            abort(400, description=f"Invalid duty_id: {duty_id}")
-
     new_coin_dict = model_to_dict(new_coin)
     new_coin_dict["id"] = str(new_coin_dict["id"])
 
     return jsonify(new_coin_dict), 201
 
 
-@app.patch("/coins/<coin_id>")
-def update_coin(coin_id):
+@app.post("/v2/coins")
+def create_coin_v2():
+    data = request.json
+
+    if not data or "name" not in data:
+        abort(400, description="Missing 'name' key in request body.")
+
+    name = data["name"].strip()
+    if not name:
+        abort(400, description="Coin name cannot be empty.")
+
+    if Coin.select().where(Coin.name == name).exists():
+        abort(400, description="Coin already exists. Please choose another name.")
+
+    new_coin = Coin.create(name=name)
+
+    duty_codes = data.get("duty_codes", []) 
+    for code in duty_codes:
+        try:
+            duty_obj = Duty.get(Duty.code == code.upper())
+            DutyCoin.create(coin=new_coin, duty=duty_obj)
+        except DoesNotExist:
+            abort(400, description=f"Duty with code '{code}' does not exist.")
+
+    coin_dict = serialize_coin_with_duties(new_coin)
+
+    return jsonify(coin_dict), 201
+
+
+# PATCH/UPDATE COIN
+@app.patch("/v1/coins/<coin_id>")
+def update_coin_v1(coin_id):
     try:
         uuid_obj = uuid.UUID(coin_id)
     except ValueError:
@@ -100,10 +147,33 @@ def update_coin(coin_id):
     name = data["name"].strip()
     if not name:
         abort(400, description="Coin name cannot be empty.")
-    
-    duty_ids = data.get("duty_ids")
-    if duty_ids is not None and not isinstance(duty_ids, list):
-        abort(400, description="duty_ids must be a list of UUID strings.")
+
+    try:
+        coin = Coin.get_by_id(uuid_obj)
+    except Coin.DoesNotExist:
+        abort(404, description="Coin not found.")
+
+    coin.name = name
+    coin.save()
+
+    coin_dict = model_to_dict(coin)
+    coin_dict["id"] = str(coin_dict["id"])
+    return jsonify(coin_dict), 200
+
+
+@app.patch("/v2/coins/<coin_id>")
+def update_coin_v2(coin_id):
+    try:
+        uuid_obj = uuid.UUID(coin_id)
+    except ValueError:
+        abort(400, description="Invalid Coin ID format. Coin ID must be a UUID (non-integer).")
+
+    data = request.json
+    if not data:
+        abort(400, description="Request body is empty.")
+
+    name = data.get("name")
+    duty_codes = data.get("duty_codes")
 
     try:
         coin = Coin.get_by_id(uuid_obj)
@@ -111,32 +181,31 @@ def update_coin(coin_id):
         abort(404, description="Coin not found.")
 
     if name is not None:
+        name = name.strip()
+        if not name:
+            abort(400, description="Coin name cannot be empty.")
         coin.name = name
         coin.save()
-    
-    if duty_ids is not None:
+
+    if duty_codes is not None:
+        if not isinstance(duty_codes, list):
+            abort(400, description="'duty_codes' must be a list of duty codes")
+        
         DutyCoin.delete().where(DutyCoin.coin == coin).execute()
-    
-    for duty_id in duty_ids:
+
+        for code in duty_codes:
             try:
-                duty_uuid = uuid.UUID(duty_id)
-                duty = Duty.get_by_id(duty_uuid)
+                duty = Duty.get(Duty.code == code.upper())
                 DutyCoin.create(duty=duty, coin=coin)
-            except (ValueError, Duty.DoesNotExist):
-                abort(400, description=f"Invalid duty_id: {duty_id}")
+            except Duty.DoesNotExist:
+                abort(400, description=f"Invalid duty code: {code}")
 
-    coin_dict = model_to_dict(coin)
-    coin_dict["id"] = str(coin_dict["id"])
-
-    duties = []
-    for duty_coin in coin.coin_duties:
-        duties.append({"id": str(duty_coin.duty.id), "name": duty_coin.duty.name})
-
-    coin_dict["duties"] = duties
+    coin_dict = serialize_coin_with_duties(coin)
 
     return jsonify(coin_dict), 200
 
 
+# DELETE COIN
 @app.delete("/coins/<coin_id>")
 def delete_coin(coin_id):
     try:
@@ -170,29 +239,6 @@ def get_duties():
 
     return jsonify(duty_dicts), 200
 
-# GET DUTY BY ID WITH ASSOCIATED COINS
-# @app.get("/duties/<duty_id>")
-# def get_duty_by_id(duty_id):
-#     try:
-#         uuid_obj = uuid.UUID(duty_id)
-#     except ValueError:
-#         abort(400, description="Invalid Duty ID format. Duty ID must be a UUID (non-integer).")
-
-#     try:
-#         duty = Duty.get_by_id(uuid_obj)
-#     except Duty.DoesNotExist:
-#         abort(404, description="Duty not found.")
-
-#     duty_dict = model_to_dict(duty)
-#     duty_dict["id"] = str(duty.id)
-
-#     coins = []
-#     for duty_coin in duty.duty_coins:
-#         coins.append({"id": str(duty_coin.coin.id), "name": duty_coin.coin.name})
-
-#     duty_dict["coins"] = coins
-
-#     return jsonify(duty_dict), 200
 
 # GET DUTY BY CODE WITH ASSOCIATED COINS
 @app.get("/duties/<duty_code>")
@@ -201,7 +247,7 @@ def get_duty_by_code(duty_code):
 
     regex = r"^D\d+$"
     if not re.match(regex, duty_code):
-        abort(400, description="Invalid Duty Code format. Duty Code must start with a 'D' or 'd' followed by numbers (e.g., D7 or d7).")
+        abort(400, description="Invalid Duty Code format. Duty Code must start with a 'D' (case-insensitive) followed by numbers (e.g., D7 or d7).")
 
     try:
         duty = Duty.get(Duty.code == duty_code)
@@ -249,13 +295,14 @@ def get_ksbs():
 
     return jsonify(ksbs), 200
 
-# GET KSB BY ID WITH ASSOCIATED DUTIES
-@app.get("/ksbs/<ksb_id>")
-def get_ksb_by_id(ksb_id):
-    try:
-        uuid_obj = uuid.UUID(ksb_id)
-    except ValueError:
-        abort(400, description="Invalid KSB ID format. KSB ID must be a UUID (non-integer).")
+
+# GET KSB BY KSB CODE WITH ASSOCIATED DUTIES
+@app.get("/ksbs/<ksb_code>")
+def get_ksb_by_code(ksb_code):
+    ksb_code = ksb_code.upper()
+    regex = r"^[KSB]\d+[a-zA-Z]?$"
+    if not re.match(regex, ksb_code):
+        abort(400, description="Invalid KSB Code format. KSB Code must start with 'K', 'S', or 'B', followed by numbers and optionally a letter (e.g., K1, K1a, S2, B3b).")
     
     ksb = None
     ksb_type = None
@@ -266,7 +313,7 @@ def get_ksb_by_id(ksb_id):
         (Behaviour, "Behaviour"),
     ]:
         try:
-            ksb = model.get_by_id(uuid_obj)
+            ksb = model.get(model.code == ksb_code)
             ksb_type = ksb_type_name
             break
         except model.DoesNotExist:

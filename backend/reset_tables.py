@@ -1,8 +1,10 @@
-from pg_db_connection import pg_db
+from pg_db_connection import pg_db, database
 from models import (
     Coin, Duty, Knowledge, Skill, Behaviour,
     DutyCoin, DutyKnowledge, DutySkill, DutyBehaviour
 )
+
+database.initialize(pg_db)
 
 pg_db.drop_tables([
     DutyCoin, DutyKnowledge, DutySkill, DutyBehaviour,

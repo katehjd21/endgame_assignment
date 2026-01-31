@@ -1,11 +1,11 @@
 from peewee import *
-from pg_db_connection import pg_db
+from pg_db_connection import database
 import uuid
 
 
 class BaseModel(Model):
     class Meta:
-        database = pg_db
+        database = database
 
 class Coin(BaseModel):
     id = UUIDField(primary_key=True, default=uuid.uuid4)
