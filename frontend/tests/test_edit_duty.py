@@ -3,7 +3,7 @@ from morelia import verify
 from controllers.duties_controller import DutiesController
 import os
 
-FEATURE_DIR = os.path.join(os.path.dirname(__file__), 'tests')
+FEATURE_DIR = os.path.dirname(__file__)
 
 class TestEditDuty(unittest.TestCase):
     def test_add_edit_duty_feature(self):
