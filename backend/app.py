@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, abort, request
 from backend.models import Coin, Duty, Knowledge, Skill, Behaviour, DutyCoin
-from utils.helper_functions import serialize_coin, serialize_coin_with_duties, serialize_duty, serialize_ksb, serialize_duty_with_coins, serialize_ksb_with_duties
+from backend.utils.helper_functions import serialize_coin, serialize_coin_with_duties, serialize_duty, serialize_ksb, serialize_duty_with_coins, serialize_ksb_with_duties
 from playhouse.shortcuts import model_to_dict
 import uuid
 import re
