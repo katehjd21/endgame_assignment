@@ -1,5 +1,5 @@
 from peewee import *
-from pg_db_connection import database
+from backend.pg_db_connection import database
 import uuid
 
 
