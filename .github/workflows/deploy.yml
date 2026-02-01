@@ -33,12 +33,14 @@ jobs:
       - name: Run Backend Tests
         run: |
           source .venv/bin/activate
-          pytest backend/tests/
+          cd backend
+          pytest tests/
 
       - name: Run Frontend Tests
         run: |
           source .venv/bin/activate
-          pytest frontend/tests/  
+          cd frontend
+          pytest tests/  
 
   terraform:
     needs: test
