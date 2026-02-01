@@ -1,4 +1,4 @@
-from models import Knowledge, Skill, Behaviour, Duty, DutyKnowledge, DutySkill, DutyBehaviour
+from backend.models import Knowledge, Skill, Behaviour, Duty, DutyKnowledge, DutySkill, DutyBehaviour
 import uuid
 
 # GET KSBS
