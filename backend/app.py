@@ -1,10 +1,10 @@
 from flask import Flask, jsonify, abort, request
-from models import Coin, Duty, Knowledge, Skill, Behaviour, DutyCoin
+from backend.models import Coin, Duty, Knowledge, Skill, Behaviour, DutyCoin
 from utils.helper_functions import serialize_coin, serialize_coin_with_duties, serialize_duty, serialize_ksb, serialize_duty_with_coins, serialize_ksb_with_duties
 from playhouse.shortcuts import model_to_dict
 import uuid
 import re
-from pg_db_connection import pg_db, database 
+from backend.pg_db_connection import pg_db, database 
 import os
 from peewee import DoesNotExist
 
