@@ -1,5 +1,5 @@
 import pytest
-from pg_db_connection import database, TEST_DB
+from backend.pg_db_connection import database, TEST_DB
 from app import app as flask_app
 from models import Coin, Duty, Knowledge, Skill, Behaviour, DutyCoin, DutyKnowledge, DutySkill, DutyBehaviour
 

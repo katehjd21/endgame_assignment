@@ -37,7 +37,6 @@ class Behaviour(BaseModel):
 
 
 # Junction Tables
-
 class DutyCoin(BaseModel):
     duty = ForeignKeyField(Duty, backref="duty_coins", on_delete="CASCADE")
     coin = ForeignKeyField(Coin, backref="coin_duties", on_delete="CASCADE")
