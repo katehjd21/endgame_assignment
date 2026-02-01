@@ -1,11 +1,14 @@
 import unittest
 from morelia import verify
 from controllers.duties_controller import DutiesController
+import os
+
+FEATURE_DIR = os.path.join(os.path.dirname(__file__), 'tests')
 
 class DutiesTestCase(unittest.TestCase):
 
     def test_add_duties_feature(self):
-        verify('frontend/tests/duties.feature', self)
+        verify(os.path.join(FEATURE_DIR, 'duties.feature'), self)
 
     def step_an_empty_duties_collection(self):
         r'an empty duties collection'
