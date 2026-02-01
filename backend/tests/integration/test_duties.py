@@ -25,7 +25,7 @@ def test_duties_have_id_code_name_and_description(client, duties):
         assert set(duty.keys()) == {"id", "code", "name", "description"}
 
 
-def test_get_duties_returns_correct_descriptions_and_codes(client, duties):
+def test_get_duties_returns_correct_duty_descriptions_and_codes(client, duties):
     response = client.get("/duties")
     data = response.json
 

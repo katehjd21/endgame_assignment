@@ -58,7 +58,6 @@ def coin():
 
 @pytest.fixture
 def duties():
-
     duty1 = Duty.create(code="D1", name="Duty 1", description="Duty 1 Description")
     duty2 = Duty.create(code="D2", name="Duty 2", description="Duty 2 Description")    
     duty3 = Duty.create(code="D3", name="Duty 3", description="Duty 3 Description")
@@ -68,7 +67,7 @@ def duties():
 
 @pytest.fixture
 def coin_with_duties(coin, duties):
-    for duty in duties[:2]:
+    for duty in duties:
         DutyCoin.create(coin=coin, duty=duty)
     return coin
 
@@ -95,6 +94,22 @@ def coin_without_duties():
 
 
 @pytest.fixture
+def duty_with_coins(duties, coins):
+    duty = duties[0]
+    for coin in coins[:2]:  
+        DutyCoin.create(coin=coin, duty=duty)
+    return duty
+
+
+@pytest.fixture
+def ksbs():
+    knowledge = Knowledge.create(code="K1", name="Knowledge 1", description="Knowledge 1 Description")
+    skill = Skill.create(code="S1", name="Skill 1", description="Skill 1 Description")
+    behaviour = Behaviour.create(code="B1", name="Behaviour 1", description="Behaviour 1 Description")
+    return [knowledge, skill, behaviour]
+
+
+@pytest.fixture
 def duty_with_ksb(duties):
     duty = duties[0]
 
@@ -107,3 +122,27 @@ def duty_with_ksb(duties):
     DutyBehaviour.create(duty=duty, behaviour=behaviour)
 
     return duty, knowledge, skill, behaviour
+
+
+@pytest.fixture
+def ksbs_with_duties():
+    duty1 = Duty.create(code="D1", name="Duty 1", description="Duty 1 Description")
+    duty2 = Duty.create(code="D2", name="Duty 2", description="Duty 2 Description")
+    duty3 = Duty.create(code="D3", name="Duty 3", description="Duty 3 Description")
+
+    knowledge = Knowledge.create(code="K1", name="Knowledge 1", description="Knowledge 1 Description")
+    skill = Skill.create(code="S1", name="Skill 1", description="Skill 1 Description")
+    behaviour = Behaviour.create(code="B1", name="Behaviour 1", description="Behaviour 1 Description")
+
+    DutyKnowledge.create(duty=duty1, knowledge=knowledge)
+    DutyKnowledge.create(duty=duty2, knowledge=knowledge)
+    for duty in [duty1, duty2, duty3]:
+        DutySkill.create(duty=duty, skill=skill)
+        DutyBehaviour.create(duty=duty, behaviour=behaviour)
+
+    return {
+        "duties": [duty1, duty2, duty3],
+        "knowledge": knowledge,
+        "skill": skill,
+        "behaviour": behaviour,
+    }

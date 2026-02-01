@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, abort, request
 from models import Coin, Duty, Knowledge, Skill, Behaviour, DutyCoin
-from utils.helper_functions import serialize_coin, serialize_coin_with_duties
+from utils.helper_functions import serialize_coin, serialize_coin_with_duties, serialize_duty, serialize_ksb, serialize_duty_with_coins, serialize_ksb_with_duties
 from playhouse.shortcuts import model_to_dict
 import uuid
 import re
@@ -97,9 +97,7 @@ def create_coin_v1():
 
     new_coin = Coin.create(name=name)
 
-    new_coin_dict = model_to_dict(new_coin)
-    new_coin_dict["id"] = str(new_coin_dict["id"])
-
+    new_coin_dict = serialize_coin(new_coin)
     return jsonify(new_coin_dict), 201
 
 
@@ -128,7 +126,6 @@ def create_coin_v2():
             abort(400, description=f"Duty with code '{code}' does not exist.")
 
     coin_dict = serialize_coin_with_duties(new_coin)
-
     return jsonify(coin_dict), 201
 
 
@@ -156,8 +153,7 @@ def update_coin_v1(coin_id):
     coin.name = name
     coin.save()
 
-    coin_dict = model_to_dict(coin)
-    coin_dict["id"] = str(coin_dict["id"])
+    coin_dict = serialize_coin(coin)
     return jsonify(coin_dict), 200
 
 
@@ -201,7 +197,6 @@ def update_coin_v2(coin_id):
                 abort(400, description=f"Invalid duty code: {code}")
 
     coin_dict = serialize_coin_with_duties(coin)
-
     return jsonify(coin_dict), 200
 
 
@@ -230,14 +225,9 @@ def delete_coin(coin_id):
 @app.get("/duties")
 def get_duties():
     duties = Duty.select()
+    duties_list = [serialize_duty(duty) for duty in duties]
 
-    duty_dicts = []
-    for duty in duties:
-        duty_dict = model_to_dict(duty)
-        duty_dict["id"] = str(duty_dict["id"])
-        duty_dicts.append(duty_dict)
-
-    return jsonify(duty_dicts), 200
+    return jsonify(duties_list), 200
 
 
 # GET DUTY BY CODE WITH ASSOCIATED COINS
@@ -254,46 +244,20 @@ def get_duty_by_code(duty_code):
     except Duty.DoesNotExist:
         abort(404, description="Duty not found.")
 
-    duty_dict = model_to_dict(duty)
-    duty_dict["id"] = str(duty.id)
-
-    coins = []
-    for duty_coin in duty.duty_coins:
-        coins.append({"id": str(duty_coin.coin.id), "name": duty_coin.coin.name})
-
-    duty_dict["coins"] = coins
-
+    duty_dict = serialize_duty_with_coins(duty)
     return jsonify(duty_dict), 200
 
 
 # GET KSBS
 @app.get("/ksbs")
 def get_ksbs():
-    knowledges = Knowledge.select()
-    skills = Skill.select()
-    behaviours = Behaviour.select()
+    ksbs_list = []
 
-    ksbs = []
+    for model, ksb_type in [(Knowledge, "Knowledge"), (Skill, "Skill"), (Behaviour, "Behaviour")]:
+        for ksb in model.select():
+            ksbs_list.append(serialize_ksb(ksb, ksb_type))
 
-    for knowledge in knowledges:
-        knowledge_dict = model_to_dict(knowledge)
-        knowledge_dict["id"] = str(knowledge.id)
-        knowledge_dict["type"] = "Knowledge"
-        ksbs.append(knowledge_dict)
-
-    for skill in skills:
-        skill_dict = model_to_dict(skill)
-        skill_dict["id"] = str(skill.id)
-        skill_dict["type"] = "Skill"
-        ksbs.append(skill_dict)
-
-    for behaviour in behaviours:
-        behaviour_dict = model_to_dict(behaviour)
-        behaviour_dict["id"] = str(behaviour.id)
-        behaviour_dict["type"] = "Behaviour"
-        ksbs.append(behaviour_dict)
-
-    return jsonify(ksbs), 200
+    return jsonify(ksbs_list), 200
 
 
 # GET KSB BY KSB CODE WITH ASSOCIATED DUTIES
@@ -322,26 +286,7 @@ def get_ksb_by_code(ksb_code):
     if not ksb:
         abort(404, description="KSB not found.")
 
-    ksb_dict = model_to_dict(ksb)
-    ksb_dict["id"] = str(ksb.id)
-    ksb_dict["type"] = ksb_type
-
-    duties = []
-
-    if ksb_type == "Knowledge":
-        for knowledge_duty in ksb.knowledge_duties:
-            duties.append({"id": str(knowledge_duty.duty.id), "name": knowledge_duty.duty.name})
-
-    elif ksb_type == "Skill":
-        for skill_duties in ksb.skill_duties:
-            duties.append({"id": str(skill_duties.duty.id), "name": skill_duties.duty.name})
-
-    elif ksb_type == "Behaviour":
-        for behaviour_duty in ksb.behaviour_duties:
-            duties.append({"id": str(behaviour_duty.duty.id), "name": behaviour_duty.duty.name})
-
-    ksb_dict["duties"] = duties
-
+    ksb_dict = serialize_ksb_with_duties(ksb, ksb_type)
     return jsonify(ksb_dict), 200
 
 if __name__ == '__main__':
