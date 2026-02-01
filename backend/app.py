@@ -218,7 +218,7 @@ def delete_coin(coin_id):
 
     coin.delete_instance()
 
-    return "", 204
+    return jsonify({"message": "Coin has been successfully deleted!"}), 200
 
 
 # GET DUTIES

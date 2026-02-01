@@ -122,10 +122,7 @@ def test_serialize_ksb_with_duties_has_correct_duties(ksbs_with_duties):
         ksb = ksbs_with_duties[ksb_type]
         result = serialize_ksb_with_duties(ksb, ksb_type.capitalize())
         if ksb_type == "knowledge":
-            expected_duties = [{"id": str(duty.id), "name": duty.name} for duty in ksbs_with_duties["duties"][:2]]
+            expected_duties = [{"id": str(duty.id), "code": duty.code, "name": duty.name, "description": duty.description} for duty in ksbs_with_duties["duties"][:2]]
         else:
-            expected_duties = [{"id": str(duty.id), "name": duty.name} for duty in ksbs_with_duties["duties"]]
+            expected_duties = [{"id": str(duty.id), "code": duty.code, "name": duty.name, "description": duty.description} for duty in ksbs_with_duties["duties"]]
         assert result["duties"] == expected_duties
-        
-
-    

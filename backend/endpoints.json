@@ -1,0 +1,202 @@
+{
+  "GET /v1/coins": {
+    "description": "Retrieves a list of all coins with their id and name.",
+    "exampleResponse": [
+      {
+        "id": "uuid-of-coin",
+        "name": "Example Coin"
+      }
+    ]
+  },
+  "GET /v2/coins": {
+    "description": "Retrieves a list of all coins along with the duties associated with each coin.",
+    "exampleResponse": [
+      {
+        "id": "uuid-of-coin",
+        "name": "Example Coin",
+        "duties": [
+          {
+            "id": "uuid-of-duty",
+            "code": "D1",
+            "name": "Duty 1 Name",
+            "description": "Duty 1 Description"
+          }
+        ]
+      }
+    ]
+  },
+  "GET /v1/coins/:coin_id": {
+    "description": "Retrieves a single coin by its UUID with id and name.",
+    "exampleResponse": {
+      "id": "uuid-of-coin",
+      "name": "Example Coin"
+    }
+  },
+  "GET /v2/coins/:coin_id": {
+    "description": "Retrieves a single coin by its UUID along with associated duties.",
+    "exampleResponse": {
+      "id": "uuid-of-coin",
+      "name": "Example Coin",
+      "duties": [
+        {
+          "id": "uuid-of-duty",
+          "code": "D1",
+          "name": "Duty 1 Name",
+          "description": "Duty 1 Description"
+        }
+      ]
+    }
+  },
+  "POST /v1/coins": {
+    "description": "Creates a new coin with a name only.",
+    "requestBody": {
+      "name": "Example Coin"
+    },
+    "exampleResponse": {
+      "id": "uuid-of-new-coin",
+      "name": "Example Coin"
+    }
+  },
+  "POST /v2/coins": {
+    "description": "Creates a new coin and optionally associates duties using duty_codes.",
+    "requestBody": {
+      "name": "Example Coin",
+      "duty_codes": ["D1", "D2"]
+    },
+    "exampleResponse": {
+      "id": "uuid-of-coin",
+      "name": "Example Coin",
+      "duties": [
+        {
+          "id": "uuid-of-duty",
+          "code": "D1",
+          "name": "Duty 1 Name",
+          "description": "Duty 1 Description"
+        },
+        {
+          "id": "uuid-of-duty",
+          "code": "D2",
+          "name": "Duty 2 Name",
+          "description": "Duty 2 Description"
+        }
+      ]
+    }
+  },
+  "PATCH /v1/coins/:coin_id": {
+    "description": "Updates the name of a coin by UUID.",
+    "requestBody": {
+      "name": "Updated Coin Name"
+    },
+    "exampleResponse": {
+      "id": "uuid-of-coin",
+      "name": "Updated Coin Name"
+    }
+  },
+  "PATCH /v2/coins/:coin_id": {
+    "description": "Updates the name and/or associated duties of a coin.",
+    "requestBody": {
+      "name": "Updated Coin Name",
+      "duty_codes": ["D1", "D3"]
+    },
+    "exampleResponse": {
+      "id": "uuid-of-coin",
+      "name": "Updated Coin Name",
+      "duties": [
+        {
+          "id": "uuid-of-duty",
+          "code": "D1",
+          "name": "Duty 1 Name",
+          "description": "Duty 1 Description"
+        },
+        {
+          "id": "uuid-of-duty",
+          "code": "D3",
+          "name": "Duty 3 Name",
+          "description": "Duty 3 Description"
+        }
+      ]
+    }
+  },
+  "DELETE /coins/:coin_id": {
+    "description": "Deletes a coin by UUID. Returns a 200 OK with a success message on successful deletion.",
+    "exampleResponse": {
+      "message": "Coin has been successfully deleted!"
+    }
+  },
+  "GET /duties": {
+    "description": "Retrieves a list of all duties.",
+    "exampleResponse": [
+      {
+        "id": "uuid-of-duty",
+        "code": "D1",
+        "name": "Duty 1 Name",
+        "description": "Duty 1 Description"
+      }
+    ]
+  },
+  "GET /duties/:duty_code": {
+    "description": "Retrieves a single duty by code along with coins associated with it.",
+    "exampleResponse": {
+      "id": "uuid-of-duty",
+      "code": "D1",
+      "name": "Duty 1 Name",
+      "description": "Duty 1 Description",
+      "coins": [
+        {
+          "id": "uuid-of-coin",
+          "name": "Example Coin"
+        }
+      ]
+    }
+  },
+  "GET /ksbs": {
+    "description": "Retrieves a list of all KSBs (Knowledge, Skill, Behaviour).",
+    "exampleResponse": [
+      {
+        "id": "uuid-of-ksb",
+        "code": "K1",
+        "name": "Knowledge 1 Name",
+        "description": "Knowledge 1 Description",
+        "type": "Knowledge"
+      },
+      {
+        "id": "uuid-of-ksb",
+        "code": "S1",
+        "name": "Skill 1 Name",
+        "description": "Skill 1 Description",
+        "type": "Skill"
+      },
+      {
+        "id": "uuid-of-ksb",
+        "code": "B1",
+        "name": "Behaviour 1 Name",
+        "description": "Behaviour 1 Description",
+        "type": "Behaviour"
+      }
+    ]
+  },
+  "GET /ksbs/:ksb_code": {
+    "description": "Retrieves a single KSB by code along with associated duties.",
+    "exampleResponse": {
+      "id": "uuid-of-ksb",
+      "code": "K1",
+      "name": "Knowledge 1 Name",
+      "description": "Knowledge 1 Description",
+      "type": "Knowledge",
+      "duties": [
+        {
+          "id": "uuid-of-duty",
+          "code": "D1",
+          "name": "Duty 1 Name",
+          "description": "Duty 1 Description"
+        },
+        {
+          "id": "uuid-of-duty",
+          "code": "D2",
+          "name": "Duty 2 Name",
+          "description": "Duty 2 Description"
+        }
+      ]
+    }
+  }
+}

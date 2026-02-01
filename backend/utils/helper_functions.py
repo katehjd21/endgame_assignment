@@ -50,13 +50,13 @@ def serialize_ksb_with_duties(ksb, ksb_type):
     ksb_dict["type"] = ksb_type
 
     if ksb_type == "Knowledge":
-        duties = [{"id": str(duty_assoc.duty.id), "name": duty_assoc.duty.name} 
+        duties = [{"id": str(duty_assoc.duty.id), "code": duty_assoc.duty.code, "name": duty_assoc.duty.name, "description": duty_assoc.duty.description} 
                   for duty_assoc in ksb.knowledge_duties]
     elif ksb_type == "Skill":
-        duties = [{"id": str(duty_assoc.duty.id), "name": duty_assoc.duty.name} 
+        duties = [{"id": str(duty_assoc.duty.id), "code": duty_assoc.duty.code, "name": duty_assoc.duty.name, "description": duty_assoc.duty.description} 
                   for duty_assoc in ksb.skill_duties]
     elif ksb_type == "Behaviour":
-        duties = [{"id": str(duty_assoc.duty.id), "name": duty_assoc.duty.name} 
+        duties = [{"id": str(duty_assoc.duty.id), "code": duty_assoc.duty.code, "name": duty_assoc.duty.name, "description": duty_assoc.duty.description} 
                   for duty_assoc in ksb.behaviour_duties]
 
     ksb_dict["duties"] = duties
