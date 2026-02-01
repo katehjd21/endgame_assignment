@@ -96,7 +96,7 @@ resource "aws_route_table_association" "rt_association" {
   route_table_id = aws_route_table.public_rt.id
 }
 
-resource "aws_instance" "testing_pyramid" {
+resource "aws_instance" "endgame-assignment" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.main.id
@@ -106,6 +106,6 @@ resource "aws_instance" "testing_pyramid" {
   user_data = file("${path.module}/cloud-init.yml")
 
   tags = {
-    Name = "kds-testing-pyramid"
+    Name = "kds-endgame-assignment"
   }
 }

@@ -290,4 +290,4 @@ def get_ksb_by_code(ksb_code):
     return jsonify(ksb_dict), 200
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=8080, debug=True)
