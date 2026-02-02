@@ -11,8 +11,8 @@ runcmd:
   - git clone https://github.com/katehjd21/endgame_assignment.git /home/ubuntu/app
   - cd /home/ubuntu/app
 
-  - docker build -t endgame-backend -f backend/Dockerfile ./backend
-  - docker build -t endgame-frontend -f frontend/Dockerfile ./frontend
+  - docker build -t endgame-backend -f backend/Dockerfile .
+  - docker build -t endgame-frontend -f frontend/Dockerfile .
 
   - docker rm -f frontend || true
   - docker rm -f backend || true
