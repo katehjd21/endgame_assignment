@@ -1,5 +1,5 @@
 import uuid
-from backend.models import Duty, DutyCoin, DutyKnowledge, DutySkill, DutyBehaviour
+from models import Duty, DutyCoin, DutyKnowledge, DutySkill, DutyBehaviour
 
 
 # GET DUTIES

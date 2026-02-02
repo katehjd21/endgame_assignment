@@ -1,7 +1,7 @@
 import pytest
-from backend.pg_db_connection import database, TEST_DB
-from backend.app import app as flask_app
-from backend.models import Coin, Duty, Knowledge, Skill, Behaviour, DutyCoin, DutyKnowledge, DutySkill, DutyBehaviour
+from pg_db_connection import database, TEST_DB
+from app import app as flask_app
+from models import Coin, Duty, Knowledge, Skill, Behaviour, DutyCoin, DutyKnowledge, DutySkill, DutyBehaviour
 
 
 @pytest.fixture(scope="function", autouse=True)

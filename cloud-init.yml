@@ -11,16 +11,21 @@ runcmd:
   - git clone https://github.com/katehjd21/endgame_assignment.git /home/ubuntu/app
   - cd /home/ubuntu/app
 
+  - echo "DB_USERNAME=${db_username}" > /home/ubuntu/app/backend/.env
+  - echo "DB_PASSWORD=${db_password}" >> /home/ubuntu/app/backend/.env
+  - echo "HOST=${host}" >> /home/ubuntu/app/backend/.env
+  - echo "PORT=${port}" >> /home/ubuntu/app/backend/.env
+  - echo "DATABASE=${database}" >> /home/ubuntu/app/backend/.env
+
   - docker build -t endgame-backend ./backend
+
   - docker rm -f backend-app || true
+
   - docker run -d --restart always -p 5000:5000 \
-      -e DB_USERNAME=${db_username} \
-      -e DB_PASSWORD=${db_password} \
-      -e HOST=${host} \
-      -e PORT=${port} \
-      -e DATABASE=${database} \
+      -v /home/ubuntu/app/backend/.env:/app/.env \
       --name backend-app endgame-backend
 
   - docker build -t endgame-frontend ./frontend
   - docker rm -f frontend-app || true
-  - docker run -d --restart always -p 80:8080 --name frontend-app endgame-frontend
+  - docker run -d --restart always -p 80:8080 \
+      --name frontend-app endgame-frontend
