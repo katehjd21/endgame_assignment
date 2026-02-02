@@ -1,4 +1,4 @@
-from backend.models import Coin, Duty, DutyCoin
+from models import Coin, Duty, DutyCoin
 import pytest
 import uuid
 from peewee import IntegrityError
