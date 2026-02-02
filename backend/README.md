@@ -43,7 +43,26 @@ cd endgame_assignment/backend
 
 ---
 
-## Running the Backend
+## AWS Deployed Backend
+
+The backend API is deployed on an AWS EC2 instance in the Made Tech sandbox.  
+
+To access the API endpoints:
+
+1. Get the public IP address of the EC2 instance.
+2. Use `http://<EC2-IP>:5000` (Flask runs on port 5000 by default). **If the link shows `https://`, remove the `s`.**
+3. Append the endpoint path, for example:
+   - Get all coins (v1): `http://<EC2-IP>:5000/v1/coins`
+   - Create a new coin (v2): `http://<EC2-IP>:5000/v2/coins`
+  
+**Example:**  
+If your EC2 IP is **86.170.229.47**, access the coins endpoint like this:  
+`http://86.170.229.47:5000/v1/coins`
+
+
+---
+
+## Running the Backend Locally
 
 Start the backend server with:
 
