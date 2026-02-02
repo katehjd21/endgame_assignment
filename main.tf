@@ -55,9 +55,17 @@ resource "aws_security_group" "instance_sg" {
   }
 
   ingress {
-  description = "Flask app"
+  description = "Frontend Flask app"
   from_port   = 8080
   to_port     = 8080
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
+ingress {
+  description = "Backend Flask API"
+  from_port   = 5000
+  to_port     = 5000
   protocol    = "tcp"
   cidr_blocks = ["0.0.0.0/0"]
 }
@@ -97,13 +105,20 @@ resource "aws_route_table_association" "rt_association" {
 }
 
 resource "aws_instance" "endgame-assignment" {
-  ami                    = data.aws_ami.ubuntu.id
-  instance_type          = "t2.micro"
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t2.micro"
+
   subnet_id              = aws_subnet.main.id
   vpc_security_group_ids = [aws_security_group.instance_sg.id]
   associate_public_ip_address = true
 
-  user_data = file("${path.module}/cloud-init.yml")
+  user_data = templatefile("${path.module}/cloud-init.yml", {
+    db_username = var.db_username
+    db_password = var.db_password
+    host        = var.host
+    port        = var.port
+    database    = var.database
+  })
 
   tags = {
     Name = "kds-endgame-assignment"

@@ -9,10 +9,9 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  test-backend:
     runs-on: ubuntu-latest
     
-
     steps:
       - name: Checkout the code
         uses: actions/checkout@v4
@@ -20,35 +19,57 @@ jobs:
       - name: Setup Python 
         uses: actions/setup-python@v5
         with:
-            python-version: 3.13
+          python-version: 3.13
     
       - name: Install Dependencies
         run: |
+          cd backend
           python3 -m venv .venv
           source .venv/bin/activate
           python3 -m pip install --upgrade pip
-          pip install -r requirements.txt 
+          pip install -r requirements.txt
           pip install pytest
 
-      - name: Run Backend Tests
+      - name: Run Tests
         run: |
+          cd backend
           source .venv/bin/activate
           export DB_USERNAME=${{ secrets.DB_USERNAME }}
           export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
           export HOST=${{ secrets.HOST }}
           export PORT=${{ secrets.PORT }}
           export DATABASE=${{ secrets.DATABASE }}
-          cd backend
           pytest tests/
 
-      - name: Run Frontend Tests
+  test-frontend:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+
+      - name: Setup Python 
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.13
+    
+      - name: Install Dependencies
         run: |
-          source .venv/bin/activate
           cd frontend
-          pytest tests/  
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python3 -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Run Tests
+        run: |
+          cd frontend
+          source .venv/bin/activate
+          pytest tests/
 
   terraform:
-    needs: test
+    needs: [test-backend, test-frontend]
     runs-on: ubuntu-latest
     if: success()
     
@@ -74,9 +95,19 @@ jobs:
         run: terraform fmt 
 
       - name: Terraform Plan
-        run: terraform plan
+        run: |
+          terraform plan \
+            -var="db_username=${{ secrets.DB_USERNAME }}" \
+            -var="db_password=${{ secrets.DB_PASSWORD }}" \
+            -var="host=${{ secrets.HOST }}" \
+            -var="port=${{ secrets.PORT }}" \
+            -var="database=${{ secrets.DATABASE }}"
 
       - name: Terraform Apply
         run: |
-          terraform apply -auto-approve
- 
+          terraform apply -auto-approve \
+            -var="db_username=${{ secrets.DB_USERNAME }}" \
+            -var="db_password=${{ secrets.DB_PASSWORD }}" \
+            -var="host=${{ secrets.HOST }}" \
+            -var="port=${{ secrets.PORT }}" \
+            -var="database=${{ secrets.DATABASE }}"
