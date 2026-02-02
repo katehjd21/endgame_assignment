@@ -1,4 +1,4 @@
-from utils.helper_functions import serialize_coin, serialize_coin_with_duties, serialize_duty, serialize_ksb, serialize_duty_with_coins, serialize_ksb_with_duties
+from backend.utils.helper_functions import serialize_coin, serialize_coin_with_duties, serialize_duty, serialize_ksb, serialize_duty_with_coins, serialize_ksb_with_duties
 
 
 # SERIALIZE COIN
